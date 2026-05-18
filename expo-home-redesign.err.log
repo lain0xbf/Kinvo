@@ -1,0 +1,25 @@
+The following packages should be updated for best compatibility with the installed expo version:
+  expo@54.0.33 - expected version: ~54.0.34
+  expo-image-picker@17.0.10 - expected version: ~17.0.11
+  expo-linking@8.0.11 - expected version: ~8.0.12
+Your project may not work correctly until you install the expected versions of the packages.
+C:\Users\joaol\OneDrive\Área de Trabalho\feriasApp\node_modules\expo\node_modules\@expo\cli\build\src\utils\errors.js:130
+    throw error;
+    ^
+
+Error: write EPIPE
+    at ChildProcess.target._send (node:internal/child_process:878:20)
+    at ChildProcess.target.send (node:internal/child_process:751:19)
+    at ChildProcessWorker.initialize (C:\Users\joaol\OneDrive\Área de Trabalho\feriasApp\node_modules\jest-worker\build\workers\ChildProcessWorker.js:169:17)
+    at ChildProcessWorker._onExit (C:\Users\joaol\OneDrive\Área de Trabalho\feriasApp\node_modules\jest-worker\build\workers\ChildProcessWorker.js:334:12)
+    at ChildProcess.emit (node:events:524:28)
+    at Process.ChildProcess._handle.onexit (node:internal/child_process:293:12)
+Emitted 'error' event on ChildProcess instance at:
+    at node:internal/child_process:882:39
+    at processTicksAndRejections (node:internal/process/task_queues:77:11) {
+  errno: -4047,
+  code: 'EPIPE',
+  syscall: 'write'
+}
+
+Node.js v20.19.4
