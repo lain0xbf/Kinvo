@@ -1,18 +1,15 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Auth, getAuth, getReactNativePersistence, initializeAuth } from 'firebase/auth';
-import { getDatabase } from 'firebase/database';
-import { getStorage } from 'firebase/storage';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyAGI4OOgAmMpbT0GAtUn7LVUsOugNCh0gI',
-  authDomain: 'dev-set.firebaseapp.com',
-  databaseURL: 'https://dev-set-default-rtdb.firebaseio.com',
-  projectId: 'dev-set',
-  storageBucket: 'dev-set.firebasestorage.app',
-  messagingSenderId: '88218333381',
-  appId: '1:88218333381:web:4a5499c08ceaba5d8140ac',
-  measurementId: 'G-Q6VHCCLVS0',
+  apiKey: "AIzaSyB_myLB92PM2WdOMMOcaQiylgjDAPXLreM",
+  authDomain: "faculdade-firestore.firebaseapp.com",
+  projectId: "faculdade-firestore",
+  storageBucket: "faculdade-firestore.firebasestorage.app",
+  messagingSenderId: "1048540152133",
+  appId: "1:1048540152133:web:01399f7477229841127e2c"
 };
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
@@ -26,7 +23,7 @@ try {
   auth = getAuth(app);
 }
 
-export const database = getDatabase();
-export const get = getAuth();
+export const firestore = getFirestore(app);
+export const get = getAuth(app);
 
 export { app, auth };

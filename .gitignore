@@ -13,6 +13,7 @@ web-build/
 scripts/
 
 
+src/config/firebase.ts
 
 ios
 android
