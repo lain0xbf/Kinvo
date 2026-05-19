@@ -5,4 +5,4 @@ const config = getDefaultConfig(__dirname);
 
 config.resolver.resolverMainFields = ['react-native', 'browser', 'main'];
 
-module.exports = withNativeWind(config, { input: './global.css', inlineRem: 16 });
+module.exports = withNativeWind(config, { input: './global.css' });
