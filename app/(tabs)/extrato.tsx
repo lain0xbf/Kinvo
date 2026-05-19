@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
-import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { type TipoTransacao, type TransacaoFinanceira } from '@/services/transactions';
+import { excluirTransacaoDoUsuario, type TipoTransacao, type TransacaoFinanceira } from '@/services/transactions';
 import { AppText } from '@/components/ui/app-text';
 import { SurfaceCard } from '@/components/ui/surface-card';
 import { LoadingScreen } from '@/components/ui/loading-screen';
@@ -10,30 +10,41 @@ import { useAppFonts } from '@/hooks/use-app-fonts';
 import { useAuthenticatedTransactions } from '@/hooks/use-authenticated-transactions';
 import { TransactionRow } from '@/components/transactions/transaction-row';
 import { calcularResumoFinanceiro, formatarMoeda } from '@/utils/finance';
+import { ActionButton } from '@/components/ui/action-button';
 
 type Filtro = 'todas' | TipoTransacao;
+
 
 export default function Extrato() {
   const [filtro, setFiltro] = useState<Filtro>('todas');
   const [fontsLoaded] = useAppFonts();
   const { authResolvida, carregando, erro, transacoes, userId } = useAuthenticatedTransactions();
+  const [transacaoSelecionada, setTransacaoSelecionada] = useState<TransacaoFinanceira | null>(null);
 
   const transacoesFiltradas = useMemo(() => {
     if (filtro === 'todas') return transacoes;
     return transacoes.filter((item) => item.tipo === filtro);
   }, [transacoes, filtro]);
 
-  const resumo = useMemo(() => calcularResumoFinanceiro(transacoesFiltradas), [transacoesFiltradas]);
+  async function handleExcluirTransacao() {
+    if (!userId || !transacaoSelecionada) return;
 
-  const saldoFiltrado = useMemo(() => resumo.receitas - resumo.despesas, [resumo]);
-
-  const tituloFiltro = filtro === 'todas' ? 'Todas' : filtro === 'receita' ? 'Receitas' : 'Despesas';
+    await excluirTransacaoDoUsuario(userId, transacaoSelecionada.id);
+    setTransacaoSelecionada(null);
+  }
 
   const handleMudarFiltro = useCallback((proximoFiltro: Filtro) => {
     setFiltro(proximoFiltro);
   }, []);
 
-  const renderItem = useCallback(({ item }: { item: TransacaoFinanceira }) => <TransactionRow item={item} className="mb-2.5" />, []);
+  const renderItem = useCallback(
+    ({ item }: { item: TransacaoFinanceira }) => (
+      <Pressable onPress={() => setTransacaoSelecionada(item)}>
+        <TransactionRow item={item} className="mb-3" />
+      </Pressable>
+    ),
+    []
+  );
 
   if (!fontsLoaded || !authResolvida || !userId || carregando) {
     return <LoadingScreen />;
@@ -143,6 +154,77 @@ export default function Extrato() {
         windowSize={5}
         removeClippedSubviews
       />
+
+      <Modal
+        visible={!!transacaoSelecionada}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setTransacaoSelecionada(null)}
+      >
+        <View style={{
+          flex: 1,
+          justifyContent: 'center',
+          paddingHorizontal: 20,
+          backgroundColor: 'rgba(0,0,0,0.30)',
+        }}>
+          <SurfaceCard className="rounded-[28px] px-5 py-5">
+            <View className="items-center">
+
+              <AppText variant="title" weight="bold" className="mt-1 text-center text-slate-950">
+                {transacaoSelecionada?.descricao}
+              </AppText>
+
+              <AppText
+                variant="display"
+                weight="bold"
+                className={
+                  transacaoSelecionada?.tipo === 'receita'
+                    ? 'mt-3 text-emerald-600'
+                    : 'mt-3 text-rose-600'
+                }
+              >
+                {transacaoSelecionada ? formatarMoeda(transacaoSelecionada.valor) : ''}
+              </AppText>
+            </View>
+
+            <View className="mt-5 rounded-[20px] bg-slate-50 px-4 py-3">
+              <View className="flex-row items-center justify-between">
+                <AppText variant="caption" className="text-slate-500">
+                  Tipo
+                </AppText>
+                <AppText variant="caption" weight="bold" className="text-slate-800">
+                  {transacaoSelecionada?.tipo === 'receita' ? 'Receita' : 'Despesa'}
+                </AppText>
+              </View>
+
+              <View className="mt-3 flex-row items-center justify-between">
+                <AppText variant="caption" className="text-slate-500">
+                  Categoria
+                </AppText>
+                <AppText variant="caption" weight="bold" className="text-slate-800">
+                  {transacaoSelecionada?.categoria || 'Sem categoria'}
+                </AppText>
+              </View>
+            </View>
+
+            <ActionButton
+              label="Excluir transação"
+              icon={<Ionicons name="trash-outline" size={18} color="#FFFFFF" />}
+              className="mt-5 bg-rose-600"
+              onPress={() => {
+                handleExcluirTransacao()
+              }}
+            />
+
+            <ActionButton
+              label="Fechar"
+              variant="ghost"
+              className="mt-2"
+              onPress={() => setTransacaoSelecionada(null)}
+            />
+          </SurfaceCard>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

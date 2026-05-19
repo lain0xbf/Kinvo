@@ -52,13 +52,11 @@ export default function Login() {
   return (
     <SafeAreaView className="flex-1 bg-[#F6F7FB]" edges={['top', 'left', 'right']}>
       <View className="absolute -left-24 top-6 h-56 w-56 rounded-full bg-[#E4ECF8]" />
-      <View className="absolute -right-20 bottom-20 h-52 w-52 rounded-full bg-[#E5F1EB]" />
-      <View className="absolute left-10 top-40 h-20 w-20 rounded-full bg-white/60" />
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1">
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingVertical: 20 }}>
           <View className="flex-1 justify-center">
-            <View className="mb-7">
+            <View className="mb-10">
               <View className="self-start rounded-full border border-white/80 bg-white px-3 py-2 shadow-sm shadow-slate-900/5">
                 <AppText variant="caption" weight="bold" className="text-slate-800">
                   Kinvo
@@ -68,32 +66,16 @@ export default function Login() {
               <AppText variant="title" weight="bold" className="mt-3 text-slate-950">
                 {modoCadastro ? 'Crie sua conta' : 'Bem-vindo de volta'}
               </AppText>
-              <AppText variant="body" className="mt-2 max-w-[300px] text-[15px] leading-[23px] text-slate-600">
+              <AppText variant="body" className="mt-2 mb-2 max-w-[300px] text-[15px] leading-[23px] text-slate-600">
                 {modoCadastro
                   ? 'Crie seu acesso em segundos e comece a organizar suas financas.'
-                  : 'Acesse sua conta para continuar com seu controle financeiro.'}
+                  : 'Continue seu controle financeiro.'}
               </AppText>
             </View>
 
-            <View className="rounded-[30px] border border-white/80 bg-white px-5 py-5 shadow-lg shadow-slate-900/10">
-              <View className="mb-5 flex-row items-center justify-between">
-                <View>
-                  <AppText variant="caption" className="text-slate-500">
-                    Acesso
-                  </AppText>
-                  <AppText variant="subtitle" weight="bold" className="mt-1 text-slate-950">
-                    {modoCadastro ? 'Novo cadastro' : 'Entrar na conta'}
-                  </AppText>
-                </View>
+            <View className="rounded-[30px] border border-white/80 bg-white px-5 py-5 shadow-sm shadow-slate-900/5">
 
-                <View className="rounded-full bg-emerald-50 px-3 py-2">
-                  <AppText variant="caption" weight="bold" className="text-emerald-700">
-                    Seguro
-                  </AppText>
-                </View>
-              </View>
-
-              <View className="flex-row rounded-[18px] border border-slate-200 bg-slate-100 p-1.5">
+              <View className="flex-row rounded-[18px] border border-slate-200 bg-slate-100 p-1.5 mt-1">
                 {[
                   { id: 'login', title: 'Entrar', value: false },
                   { id: 'cadastro', title: 'Criar conta', value: true },
@@ -128,7 +110,7 @@ export default function Login() {
                 </AppText>
                 <View
                   className={cn(
-                    'min-h-[56px] flex-row items-center rounded-[18px] border bg-slate-50 px-4',
+                    'min-h-[56px] flex-row items-center rounded-[18px] border bg-slate-50 px-5',
                     campoFocado === 'email' ? 'border-slate-900 bg-white' : 'border-slate-200'
                   )}
                 >
@@ -156,7 +138,7 @@ export default function Login() {
                 </AppText>
                 <View
                   className={cn(
-                    'min-h-[56px] flex-row items-center rounded-[18px] border bg-slate-50 px-4',
+                    'min-h-[56px] flex-row items-center rounded-[18px] border bg-slate-50 px-5',
                     campoFocado === 'senha' ? 'border-slate-900 bg-white' : 'border-slate-200'
                   )}
                 >
@@ -194,11 +176,6 @@ export default function Login() {
                   <AppText variant="caption" className="text-slate-500">
                     {modoCadastro ? 'Use pelo menos 6 caracteres.' : 'Seus dados ficam protegidos no dispositivo.'}
                   </AppText>
-                  {!modoCadastro ? (
-                    <AppText variant="caption" weight="bold" className="text-slate-700">
-                      Acesso rapido
-                    </AppText>
-                  ) : null}
                 </View>
               </View>
 
@@ -208,18 +185,6 @@ export default function Login() {
                 label={modoCadastro ? 'Criar e entrar' : 'Entrar'}
                 className="mt-6 min-h-[56px] rounded-[18px] shadow-sm shadow-slate-900/10"
               />
-
-              <View className="mt-5 rounded-[18px] bg-slate-50 px-4 py-3">
-                <View className="flex-row items-center">
-                  <Ionicons name="shield-checkmark-outline" size={15} color="#0F172A" />
-                  <AppText variant="caption" weight="bold" className="ml-2 text-slate-800">
-                    Experiencia segura e sem friccao
-                  </AppText>
-                </View>
-                <AppText variant="caption" className="mt-1 text-slate-500">
-                  Fluxo simples, toque confortavel e autenticacao direta.
-                </AppText>
-              </View>
             </View>
           </View>
         </ScrollView>

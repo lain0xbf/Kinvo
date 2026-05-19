@@ -2,6 +2,8 @@ import { firestore } from '@/config/firebase';
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   onSnapshot,
   query,
   serverTimestamp,
@@ -114,4 +116,10 @@ export async function criarTransacaoParaUsuario(userId: string, transacao: NovaT
     data: (transacao.data ?? new Date()).toISOString(),
     criadoEm: serverTimestamp(),
   });
+}
+
+export async function excluirTransacaoDoUsuario(userId: string, transacaoId: string) {
+  const transacaoRef = doc(firestore, 'transacoes', transacaoId);
+
+  await deleteDoc(transacaoRef);
 }
