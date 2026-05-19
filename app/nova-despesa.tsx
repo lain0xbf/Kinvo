@@ -67,15 +67,20 @@ export default function NovaDespesa() {
   return (
     <SafeAreaView className="flex-1 bg-slate-100" edges={['top', 'left', 'right']}>
       <View className="flex-1 px-4 pb-4 pt-3">
-        <View className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-          <Text className="text-[24px] text-slate-900" style={{ fontFamily: 'SofiaProBold' }}>
-            Nova transação
-          </Text>
-          <Text className="mt-1 text-slate-500" style={{ fontFamily: 'SofiaProRegular' }}>
-            Registre receita ou despesa para manter seu saldo atualizado.
-          </Text>
+        <View className="rounded-3xl border border-slate-200 bg-white px-4 py-4">
+          <View className="mb-4 rounded-2xl bg-slate-50 px-4 py-3">
+            <Text className="text-[12px] uppercase tracking-[0.9px] text-slate-500" style={{ fontFamily: 'SofiaProRegular' }}>
+              Novo registro
+            </Text>
+            <Text className="mt-1 text-[26px] text-slate-900" style={{ fontFamily: 'SofiaProBold' }}>
+              Nova transação
+            </Text>
+            <Text className="mt-1 text-[13px] text-slate-500" style={{ fontFamily: 'SofiaProRegular' }}>
+              Preencha os campos e salve com segurança.
+            </Text>
+          </View>
 
-          <View className="mt-4 flex-row rounded-xl border border-slate-200 bg-slate-50 p-1">
+          <View className="mb-1 flex-row rounded-xl border border-slate-200 bg-slate-50 p-1">
             {(['despesa', 'receita'] as const).map((opcao) => {
               const ativo = tipo === opcao;
               return (
@@ -84,12 +89,12 @@ export default function NovaDespesa() {
                   onPress={() => setTipo(opcao)}
                   className={
                     ativo
-                      ? 'h-11 flex-1 items-center justify-center rounded-lg border border-slate-300 bg-white'
+                      ? 'h-11 flex-1 items-center justify-center rounded-lg border border-emerald-200 bg-white'
                       : 'h-11 flex-1 items-center justify-center rounded-lg'
                   }
                 >
                   <Text
-                    className={ativo ? 'text-slate-900' : 'text-slate-500'}
+                    className={ativo ? 'text-emerald-700' : 'text-slate-500'}
                     style={{ fontFamily: ativo ? 'SofiaProBold' : 'SofiaProRegular' }}
                   >
                     {opcao === 'despesa' ? 'Despesa' : 'Receita'}
@@ -104,7 +109,7 @@ export default function NovaDespesa() {
             onChangeText={setDescricao}
             placeholder="Descrição"
             placeholderTextColor="#94A3B8"
-            className="mt-3 h-11 rounded-xl border border-slate-300 bg-slate-50 px-3 text-slate-900"
+            className="mt-3 h-12 rounded-xl border border-slate-300 bg-slate-50 px-3 text-slate-900"
           />
           <TextInput
             value={valorTexto}
@@ -112,14 +117,14 @@ export default function NovaDespesa() {
             placeholder="Valor (ex: 89.90)"
             placeholderTextColor="#94A3B8"
             keyboardType="decimal-pad"
-            className="mt-3 h-11 rounded-xl border border-slate-300 bg-slate-50 px-3 text-slate-900"
+            className="mt-3 h-12 rounded-xl border border-slate-300 bg-slate-50 px-3 text-slate-900"
           />
           <TextInput
             value={categoria}
             onChangeText={setCategoria}
             placeholder="Categoria (opcional)"
             placeholderTextColor="#94A3B8"
-            className="mt-3 h-11 rounded-xl border border-slate-300 bg-slate-50 px-3 text-slate-900"
+            className="mt-3 h-12 rounded-xl border border-slate-300 bg-slate-50 px-3 text-slate-900"
           />
 
           {erro ? (
@@ -133,9 +138,9 @@ export default function NovaDespesa() {
           <Pressable
             onPress={handleSalvarTransacao}
             disabled={salvando}
-            className="mt-4 h-11 items-center justify-center rounded-xl bg-slate-900"
+            className="mt-4 h-12 items-center justify-center rounded-xl bg-emerald-600"
           >
-            <Text className="text-white" style={{ fontFamily: 'SofiaProBold' }}>
+            <Text className="text-[14px] text-white" style={{ fontFamily: 'SofiaProBold' }}>
               {salvando ? 'Salvando...' : 'Salvar transação'}
             </Text>
           </Pressable>
