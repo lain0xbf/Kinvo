@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "main",
-    "slug": "main",
+    "name": "kinvo",
+    "slug": "kinvo",
     "version": "1.0.0",
     "web": {
       "favicon": "./assets/favicon.png"
