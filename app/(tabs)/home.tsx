@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,12 +12,26 @@ import { useAppFonts } from '@/hooks/use-app-fonts';
 import { useAuthenticatedTransactions } from '@/hooks/use-authenticated-transactions';
 import { TransactionRow } from '@/components/transactions/transaction-row';
 import { calcularResumoFinanceiro, formatarMoeda, obterUltimaTransacao } from '@/utils/finance';
+import { ImageBackground } from 'react-native';
+import { Asset } from 'expo-asset';
+
+const fundo = require('../../assets/fundo_card.png');
+const fundo2 = require('../../assets/button.png');
 
 export default function Home() {
   const [saindo, setSaindo] = useState(false);
   const [fontsLoaded] = useAppFonts();
   const { authResolvida, carregando, erro, transacoes, userId } = useAuthenticatedTransactions();
+  const [carregouImagem, setCarregouImagem] = useState(false);
 
+  useEffect(() => {
+    async function carregarFundo() {
+      await Asset.fromModule(fundo && fundo2).downloadAsync();
+      setCarregouImagem(true);
+    }
+
+    carregarFundo();
+  }, []);
   async function handleSair() {
     setSaindo(true);
     try {
@@ -31,15 +45,25 @@ export default function Home() {
   const resumo = useMemo(() => calcularResumoFinanceiro(transacoes), [transacoes]);
   const ultimaMovimentacao = useMemo(() => obterUltimaTransacao(transacoes), [transacoes]);
 
+  const movimentacoesRecentes = useMemo(() => {
+    return [...transacoes]
+      .sort(
+        (a, b) =>
+          new Date(b.data).getTime() -
+          new Date(a.data).getTime()
+      )
+      .slice(0, 5);
+  }, [transacoes]);
+
   const saldoPositivo = resumo.saldo >= 0;
 
-  if (!fontsLoaded || !authResolvida || !userId || carregando) {
+  if (!fontsLoaded || !authResolvida || !userId || carregando || !carregouImagem) {
     return <LoadingScreen />;
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-[#F5F7FA]" edges={['top', 'left', 'right']}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96 }}>
+    <SafeAreaView className="flex-1 bg-[#F5F7FA]">
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 96 }}>
         <View className="pb-4 pt-5">
           <View className="mb-6 flex-row items-end justify-between">
             <View className="flex-1 pr-4">
@@ -65,80 +89,132 @@ export default function Home() {
             </View>
           </View>
 
-          <SurfaceCard variant="dark" className="mb-5 overflow-hidden rounded-[28px] bg-slate-950 px-5 py-5">
-            <View className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/5" />
-            <View className="flex-row items-center justify-between">
-              <View className="flex-1 pr-4">
-                <AppText variant="caption" className="text-slate-300">
-                  Saldo disponível
-                </AppText>
+          <SurfaceCard
+            className="mb-5 overflow-hidden rounded-[28px] border border-white/70 bg-white p-0 shadow-[0_12px_40px_rgba(16,185,129,0.12)]"
+          >
+            <ImageBackground
+              source={require('../../assets/fundo_card.png')}
+              resizeMode="stretch"
+              className="w-full overflow-hidden rounded-[28px] px-6 pt-6 pb-5"
+              imageStyle={{ borderRadius: 28 }}
+            >
 
-                <AppText variant="display" weight="bold" className="mt-1 text-white">
-                  {formatarMoeda(resumo.saldo)}
-                </AppText>
+              <View className="absolute inset-0 bg-white/5" />
+              <View className="flex-row items-start justify-between">
+                <View className="flex-1">
+                  <AppText className="
+    text-[15px]
+    text-zinc-500
+  ">
+                    Saldo disponível
+                  </AppText>
+
+                  <AppText
+                    weight="bold"
+                    className="mt-2 text-[42px] leading-[46px] tracking-[-1px] text-zinc-900"
+                  >
+                    {formatarMoeda(resumo.saldo)}
+                  </AppText>
+
+                  <View className="mt-3 self-start rounded-full border border-emerald-200 bg-emerald-50/80 px-3.5 py-1.5">
+                    <AppText weight="bold" className="text-[15px] text-emerald-600">
+                      ▲ 12,5% vs mês anterior
+                    </AppText>
+                  </View>
+                </View>
               </View>
 
-              <View className="h-11 w-11 items-center justify-center rounded-2xl bg-white/10">
-                <Ionicons
-                  name={saldoPositivo ? 'trending-up-outline' : 'trending-down-outline'}
-                  size={19}
-                  color="#FFFFFF"
-                />
-              </View>
-            </View>
+              <View className="my-5 h-px bg-zinc-200/70" />
+              <View className="flex-row items-center">
+                <View className="flex-1">
+                  <AppText className="text-[14px] text-zinc-500">
+                    Entradas
+                  </AppText>
 
-            <View className="mt-4 flex-row">
-              <View className="flex-1">
-                <AppText variant="caption" className="text-slate-400">
-                  Entradas
-                </AppText>
-                <AppText variant="body" weight="bold" className="text-emerald-300">
-                  {formatarMoeda(resumo.receitas)}
-                </AppText>
-              </View>
+                  <AppText weight="bold" className="mt-1 text-[20px] text-emerald-700">
+                    {formatarMoeda(resumo.receitas)}
+                  </AppText>
+                </View>
 
-              <View className="mx-4 w-px bg-white/10" />
+                <View className="mx-4 h-12 w-px bg-zinc-200/70" />
 
-              <View className="flex-1">
-                <AppText variant="caption" className="text-slate-400">
-                  Saídas
-                </AppText>
-                <AppText variant="body" weight="bold" className="mt-0.5 text-rose-300">
-                  {formatarMoeda(resumo.despesas)}
-                </AppText>
+                <View className="flex-1">
+                  <AppText className="text-[14px] text-zinc-500">
+                    Saídas
+                  </AppText>
+
+                  <AppText weight="bold" className="mt-1 text-[20px] text-rose-500">
+                    {formatarMoeda(resumo.despesas)}
+                  </AppText>
+                </View>
               </View>
-            </View>
+            </ImageBackground>
           </SurfaceCard>
 
-          <ActionButton
+          <Pressable
             onPress={() => router.push('/nova-despesa')}
-            label="Nova transação"
-            icon={<Ionicons name="add-circle-outline" size={18} color="#FFFFFF" style={{ marginRight: 8 }} />}
-            className="mb-6 min-h-[54px] rounded-[18px] mt-2"
-          />
+            className="mb-6 mt-2 overflow-hidden rounded-[24px]"
+          >
+            <ImageBackground
+              source={fundo2}
+              resizeMode="cover"
+              className="h-[70px] flex-row items-center rounded-[24px] px-4"
+              imageStyle={{
+                borderRadius: 24,
+                transform: [{ scale: 1.12 }],
+              }}
+            >
+              <View className="absolute inset-0 bg-black/5" />
 
-          <View className="mb-3 flex-row items-center justify-between">
-            <AppText variant="body" weight="bold" className="text-slate-900">
-              Atividade recente
-            </AppText>
-          </View>
+              <View className="h-12 w-12 items-center justify-center rounded-[16px] bg-white">
+                <Ionicons name="add" size={24} color="#10B981" />
+              </View>
 
-          <SurfaceCard className="rounded-[22px] px-4 py-4">
-            {ultimaMovimentacao ? (
-              <TransactionRow item={ultimaMovimentacao} className="border-0 px-0 py-0" />
-            ) : (
-              <View className="items-center px-4 py-8">
-                <View className="mb-3 h-11 w-11 items-center justify-center rounded-2xl bg-slate-100">
-                  <Ionicons name="receipt-outline" size={19} color="#64748B" />
-                </View>
-                <AppText variant="body" weight="bold" className="text-slate-900">
-                  Nenhuma movimentação ainda
+              <View className="ml-4 flex-1">
+                <AppText
+                  weight="bold"
+                  className="text-[18px] text-white"
+                >
+                  Nova transação
                 </AppText>
-                <AppText variant="caption" className="mt-1 text-center text-slate-500">
-                  Crie sua primeira transacao para acompanhar o saldo.
+
+                <AppText className="mt-0.5 text-[12px] text-white/75">
+                  Adicionar receita ou despesa
                 </AppText>
               </View>
-            )}
+
+              <Ionicons
+                name="chevron-forward"
+                size={24}
+                color="#FFFFFF"
+              />
+            </ImageBackground>
+          </Pressable>
+
+          <View className="mb-4 mt-1 px-1 flex-row items-center justify-between">
+            <AppText weight="bold" className="text-[18px] text-slate-900">
+              Atividade recente
+            </AppText>
+
+            <Pressable>
+              <AppText weight="bold" className="text-[14px] text-emerald-600">
+                Ver todas
+              </AppText>
+            </Pressable>
+          </View>
+
+          <SurfaceCard className="overflow-hidden rounded-[24px] border border-slate-100 bg-white p-0">
+            {movimentacoesRecentes.map((item, index) => (
+              <TransactionRow
+                key={item.id}
+                item={item}
+                className={
+                  index !== movimentacoesRecentes.length - 1
+                    ? 'border-b border-slate-100'
+                    : ''
+                }
+              />
+            ))}
           </SurfaceCard>
 
           {erro ? (

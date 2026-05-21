@@ -10,7 +10,7 @@ export function SurfaceCard({ className, variant = 'light', ...props }: SurfaceC
   return (
     <View
       className={cn(
-        'rounded-[24px] border px-4 py-4 shadow-sm',
+        'rounded-[24px] border shadow-sm',
         variant === 'light' &&
         'border-slate-200/80 bg-white shadow-slate-900/5',
         variant === 'dark' &&
