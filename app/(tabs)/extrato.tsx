@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, Modal, Pressable, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { excluirTransacaoDoUsuario, type TipoTransacao, type TransacaoFinanceira } from '@/services/transactions';
 import { AppText } from '@/components/ui/app-text';
@@ -43,6 +43,7 @@ export default function Extrato() {
   const { authResolvida, carregando, erro, transacoes, userId } = useAuthenticatedTransactions();
   const [transacaoSelecionada, setTransacaoSelecionada] = useState<TransacaoFinanceira | null>(null);
   const [busca, setBusca] = useState('');
+  const insets = useSafeAreaInsets();
 
   function normalizar(valor: string) {
     return valor
@@ -213,6 +214,7 @@ export default function Extrato() {
         renderItem={renderLinha}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 96 }}
         ListHeaderComponent={listHeader}
         ListEmptyComponent={
@@ -237,21 +239,18 @@ export default function Extrato() {
       <Modal
         visible={!!transacaoSelecionada}
         transparent
-        animationType="fade"
+        animationType="slide"
         onRequestClose={() => setTransacaoSelecionada(null)}
       >
-        <View style={{
-          flex: 1,
-          justifyContent: 'center',
-          paddingHorizontal: 20,
-          backgroundColor: 'rgba(15,23,42,0.42)',
+        <View className="flex-1 bg-slate-950/45">
+          <Pressable className="flex-1" onPress={() => setTransacaoSelecionada(null)} />
 
-        }}>
-          <SurfaceCard className="rounded-[28px] px-5 py-5">
+          <SurfaceCard className="rounded-t-[28px] px-5 pt-4" style={{ paddingBottom: Math.max(insets.bottom + 12, 24) }}
+          >
+            <View className="mb-3 h-1.5 w-12 self-center rounded-full bg-slate-300" />
+
             <View className="items-center">
-
               <AppText family="sofia" variant="title" weight="bold" className="mt-1 text-center text-slate-950">
-
                 {transacaoSelecionada?.descricao}
               </AppText>
 
@@ -293,7 +292,7 @@ export default function Extrato() {
               icon={<Ionicons name="trash-outline" size={18} color="#FFFFFF" />}
               className="mt-5 bg-rose-600"
               onPress={() => {
-                handleExcluirTransacao()
+                handleExcluirTransacao();
               }}
             />
 

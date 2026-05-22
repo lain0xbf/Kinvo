@@ -14,7 +14,6 @@ export const TransactionRow = memo(function TransactionRow({
   item,
   className,
 }: TransactionRowProps) {
-  console.log('Renderizou:', item.id);
   const ehReceita = item.tipo === 'receita';
   const dataFormatada = new Date(item.data).toLocaleDateString('pt-BR');
 
@@ -22,7 +21,6 @@ export const TransactionRow = memo(function TransactionRow({
   const corValor = ehReceita ? 'text-emerald-600' : 'text-slate-900';
   const bgIcone = ehReceita ? 'bg-emerald-100' : 'bg-rose-100';
   const corIcone = ehReceita ? '#10B981' : '#E11D48';
-  const corBolinha = ehReceita ? 'bg-emerald-500' : 'bg-rose-500';
 
   return (
     <View className={`flex-row items-center bg-white px-4 py-4 ${className ?? ''}`}>
