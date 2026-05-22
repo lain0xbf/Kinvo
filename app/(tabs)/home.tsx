@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -36,7 +36,8 @@ export default function Home() {
 
     carregarFundo();
   }, []);
-  async function handleSair() {
+
+  const handleSair = useCallback(async () => {
     setSaindo(true);
     try {
       await sairDaConta();
@@ -45,6 +46,7 @@ export default function Home() {
       setSaindo(false);
     }
   }
+    , []);
 
   const resumo = useMemo(() => calcularResumoFinanceiro(transacoes), [transacoes]);
   /*   const ultimaMovimentacao = useMemo(() => obterUltimaTransacao(transacoes), [transacoes]);

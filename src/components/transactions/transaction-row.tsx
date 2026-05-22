@@ -14,6 +14,7 @@ export const TransactionRow = memo(function TransactionRow({
   item,
   className,
 }: TransactionRowProps) {
+  console.log('Renderizou:', item.id);
   const ehReceita = item.tipo === 'receita';
   const dataFormatada = new Date(item.data).toLocaleDateString('pt-BR');
 
