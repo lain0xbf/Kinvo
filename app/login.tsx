@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Alert, ImageBackground, Pressable, TextInput, useWindowDimensions, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Asset } from 'expo-asset';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const fundo = require('../assets/fundo_login.webp');
 
@@ -30,6 +31,7 @@ export default function Login() {
 
   const paddingFormFocado = Math.min(height * 0.06, 56);
   const paddingScrollFocado = Math.min(height * 0.12, 100)
+  const insets = useSafeAreaInsets();
 
 
   useEffect(() => {
@@ -88,8 +90,10 @@ export default function Login() {
             flexGrow: 1,
             paddingHorizontal: 20,
             paddingTop: 12,
-            paddingBottom: formFocado ? paddingScrollFocado : 16,
-            
+            paddingBottom: formFocado
+  ? paddingScrollFocado
+  : Math.max(insets.bottom + 20, 32),
+
           }}
           keyboardShouldPersistTaps="handled"
           enableOnAndroid
@@ -104,11 +108,11 @@ export default function Login() {
               'flex-1 pb-4',
               formFocado
                 ? 'justify-center pt-2'
-                : 'justify-between pt-2'
+                : 'justify-end pt-2'
             )}
             style={formFocado ? { paddingBottom: paddingFormFocado } : undefined}
           >
-            <View className={cn('px-1', formFocado && 'mb-4')}>
+            <View className={cn('px-1 mb-10', formFocado && 'mb-4')}>
               <View className="flex-row items-center">
                 <View className="mr-2 h-10 w-10 items-center justify-center rounded-2xl bg-emerald-400/15">
                   <Ionicons name="stats-chart" size={22} color="#34D399" />
@@ -124,11 +128,11 @@ export default function Login() {
                   entering={FadeIn.duration(180)}
                   exiting={FadeOut.duration(120)}
                 >
-                  <AppText weight="bold" className="mt-10 text-[46px] leading-[50px] text-white">
+                  <AppText weight="bold" className="mt-10 text-[42px] leading-[50px] text-white">
                     Bem-vindo
                   </AppText>
 
-                  <AppText weight="bold" className="text-[46px] leading-[50px] text-emerald-400">
+                  <AppText weight="bold" className="text-[42px] leading-[50px] text-emerald-400">
                     de volta
                   </AppText>
 
@@ -140,7 +144,7 @@ export default function Login() {
               )}
             </View>
             <View className={cn(
-              'rounded-[32px] border border-emerald-400/20 bg-[#020617]/70 px-5 backdrop-blur',
+              'rounded-[32px] border border-emerald-400/20 bg-[#020617]/60 px-6 backdrop-blur',
               formFocado ? 'py-5' : 'py-6'
             )}>
               <AppText variant="body" weight="bold" className="text-center text-white text-[28px]">
@@ -157,7 +161,7 @@ export default function Login() {
                 </AppText>
                 <View
                   className={cn(
-                    'min-h-[60px] flex-row items-center rounded-[18px] border border-white/10 bg-slate-900/80 px-5',
+                    'min-h-[60px] flex-row items-center rounded-[18px] border bg-slate-900/80 px-5',
                     campoFocado === 'email'
                       ? 'border-emerald-400'
                       : 'border-white/10'
@@ -187,7 +191,7 @@ export default function Login() {
                 </AppText>
                 <View
                   className={cn(
-                    'min-h-[60px] flex-row items-center rounded-[18px] border border-white/10 bg-slate-900/80 px-5',
+                    'min-h-[60px] flex-row items-center rounded-[18px] border bg-slate-900/80 px-5',
                     campoFocado === 'senha'
                       ? 'border-emerald-400'
                       : 'border-white/10'
@@ -228,32 +232,43 @@ export default function Login() {
                 onPress={handleEnviar}
                 disabled={carregando}
                 className={cn(
-                  'mt-6 min-h-[58px] flex-row items-center justify-center rounded-[24px] bg-emerald-400 active:opacity-90',
+                  'mt-6 min-h-[58px] overflow-hidden rounded-[24px]',
                   carregando && 'opacity-70'
                 )}
-
                 style={{
-                  shadowColor: '#34D399',
+                  shadowColor: '#10B981',
                   shadowOffset: {
                     width: 0,
                     height: 10,
                   },
-                  shadowOpacity: 0.35,
+                  shadowOpacity: 0.22,
                   shadowRadius: 20,
-                  elevation: 8,
-                  overflow: 'hidden',
+                  elevation: 10,
                 }}
               >
-                <AppText
-                  weight="bold"
-                  className="text-[16px] text-slate-950"
+                <LinearGradient
+                  colors={['#2DD4BF', '#10B981', '#047857']}
+                  start={{ x: 0, y: 0.2 }}
+                  end={{ x: 1, y: 0.8 }}
+                  style={{
+                    minHeight: 58,
+                    borderRadius: 24,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
                 >
-                  {carregando
-                    ? 'Entrando...'
-                    : modoCadastro
-                      ? 'Criar conta'
-                      : 'Entrar'}
-                </AppText>
+
+                  <AppText
+                    weight="bold"
+                    className="text-[16px] text-slate-950"
+                  >
+                    {carregando
+                      ? 'Entrando...'
+                      : modoCadastro
+                        ? 'Criar conta'
+                        : 'Entrar'}
+                  </AppText>
+                </LinearGradient>
               </Pressable>
 
               <View className="mt-6 flex-row items-center justify-center">

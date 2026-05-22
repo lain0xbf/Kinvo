@@ -4,7 +4,6 @@ import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const fundo2 = require('../../assets/button.png');
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();

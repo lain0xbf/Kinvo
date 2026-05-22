@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { ImageBackground, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const fundo = require('../assets/fundo.webp');
 
@@ -53,11 +54,30 @@ export default function Onboarding() {
 
                     <Pressable
                         onPress={finalizarOnboarding}
-                        className="mt-8 rounded-full bg-emerald-400 py-4"
+                        className="mt-8 overflow-hidden rounded-full"
+                        style={{
+                            shadowColor: '#10B981',
+                            shadowOpacity: 0.22,
+                            shadowRadius: 20,
+                            shadowOffset: { width: 0, height: 10 },
+                            elevation: 10,
+                        }}
                     >
-                        <Text className="text-center text-lg font-bold text-slate-950">
-                            Vamos começar
-                        </Text>
+                        <LinearGradient
+                            colors={['#2DD4BF', '#10B981', '#047857']}
+                            start={{ x: 0, y: 0.2 }}
+                            end={{ x: 1, y: 0.8 }}
+                            style={{
+                                paddingVertical: 16,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: 999,
+                            }}
+                        >
+                            <Text className="text-center text-lg font-bold text-slate-950">
+                                Vamos começar
+                            </Text>
+                        </LinearGradient>
                     </Pressable>
                 </View>
             </SafeAreaView>

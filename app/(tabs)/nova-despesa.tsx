@@ -1,230 +1,198 @@
-import { useCallback, useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Pressable, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { excluirTransacaoDoUsuario, type TipoTransacao, type TransacaoFinanceira } from '@/services/transactions';
+import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
+import { criarTransacaoParaUsuario, type TipoTransacao } from '@/services/transactions';
+import { escutarUsuarioAutenticado } from '@/services/auth';
 import { AppText } from '@/components/ui/app-text';
-import { SurfaceCard } from '@/components/ui/surface-card';
-import { LoadingScreen } from '@/components/ui/loading-screen';
-import { useAppFonts } from '@/hooks/use-app-fonts';
-import { useAuthenticatedTransactions } from '@/hooks/use-authenticated-transactions';
-import { TransactionRow } from '@/components/transactions/transaction-row';
-import { calcularResumoFinanceiro, formatarMoeda } from '@/utils/finance';
 import { ActionButton } from '@/components/ui/action-button';
+import { LoadingScreen } from '@/components/ui/loading-screen';
+import { SurfaceCard } from '@/components/ui/surface-card';
+import { useAppFonts } from '@/hooks/use-app-fonts';
 
-type Filtro = 'todas' | TipoTransacao;
+function formatarValor(texto: string) {
+  const numero = texto.replace(/\D/g, '');
 
+  const valor = Number(numero) / 100;
 
-export default function Extrato() {
-  const [filtro, setFiltro] = useState<Filtro>('todas');
+  return valor.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+}
+
+export default function NovaDespesa() {
+  const [userId, setUserId] = useState<string | null>(null);
+  const [descricao, setDescricao] = useState('');
+  const [valorTexto, setValorTexto] = useState('');
+  const [categoria, setCategoria] = useState('');
+  const [tipo, setTipo] = useState<TipoTransacao>('despesa');
+  const [erro, setErro] = useState<string | null>(null);
+  const [salvando, setSalvando] = useState(false);
   const [fontsLoaded] = useAppFonts();
-  const { authResolvida, carregando, erro, transacoes, userId } = useAuthenticatedTransactions();
-  const [transacaoSelecionada, setTransacaoSelecionada] = useState<TransacaoFinanceira | null>(null);
 
-  const transacoesFiltradas = useMemo(() => {
-    if (filtro === 'todas') return transacoes;
-    return transacoes.filter((item) => item.tipo === filtro);
-  }, [transacoes, filtro]);
+  const router = useRouter();
 
-  async function handleExcluirTransacao() {
-    if (!userId || !transacaoSelecionada) return;
+  useEffect(() => {
+    const cancelar = escutarUsuarioAutenticado((usuario) => {
+      if (!usuario) {
+        router.replace('/login');
+        return;
+      }
 
-    await excluirTransacaoDoUsuario(userId, transacaoSelecionada.id);
-    setTransacaoSelecionada(null);
+      setUserId(usuario.uid);
+    });
+
+    return () => cancelar();
+  }, [router]);
+
+  async function handleSalvarTransacao() {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    if (!userId) return;
+
+    const valor = Number(
+      valorTexto
+        .replace(/[^\d,]/g, '')
+        .replace(',', '.')
+    );
+    if (!descricao.trim()) {
+      setErro('Informe a descricao da transacao.');
+      return;
+    }
+    if (!Number.isFinite(valor) || valor <= 0) {
+      setErro('Informe um valor valido maior que zero.');
+      return;
+    }
+
+    setErro(null);
+    setSalvando(true);
+    try {
+      await criarTransacaoParaUsuario(userId, {
+        descricao,
+        valor,
+        categoria,
+        tipo,
+      });
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      router.back();
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setErro('Nao foi possivel salvar a transacao.');
+    } finally {
+      setSalvando(false);
+    }
   }
 
-  const handleMudarFiltro = useCallback((proximoFiltro: Filtro) => {
-    setFiltro(proximoFiltro);
-  }, []);
-
-  const renderItem = useCallback(
-    ({ item }: { item: TransacaoFinanceira }) => (
-      <Pressable onPress={() => setTransacaoSelecionada(item)}>
-        <TransactionRow item={item} className="mb-3" />
-      </Pressable>
-    ),
-    []
-  );
-
-  if (!fontsLoaded || !authResolvida || !userId || carregando) {
+  if (!fontsLoaded || !userId) {
     return <LoadingScreen />;
   }
 
   return (
     <SafeAreaView className="flex-1 bg-[#F5F7FA]" edges={['top', 'left', 'right']}>
-      <View className="px-4 pt-5">
-        <View className="mb-4 flex-row items-end justify-between">
-          <View className="flex-1 pr-4">
-            <AppText variant="title" weight="bold" className="text-slate-950">
-              Movimentações
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 88 }}>
+        <SurfaceCard className="rounded-[28px] overflow-hidden px-4 py-4">
+          <View className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-slate-100" />
+          <View className="mb-5">
+            <AppText variant="title" weight="bold" className="mt-1 text-slate-950">
+              Nova transacão
             </AppText>
             <AppText variant="caption" className="mt-1 text-slate-500">
-              Acompanhe suas entradas e saídas
+              Registre uma movimentação financeira
             </AppText>
           </View>
 
-          <View className="rounded-2xl border border-slate-200 bg-white px-3 py-2">
-            <AppText variant="caption" weight="bold" className="text-slate-600">
-              {transacoesFiltradas.length} itens
-            </AppText>
-          </View>
-        </View>
-
-
-        <View
-          style={{
-            marginBottom: 14,
-            flexDirection: 'row',
-            borderRadius: 18,
-            borderWidth: 1,
-            borderColor: '#E2E8F0',
-            backgroundColor: '#FFFFFF',
-            padding: 4,
-          }}
-        >
-          {(['todas', 'receita', 'despesa'] as const).map((opcao) => {
-            const ativo = filtro === opcao;
-            const titulo = opcao === 'todas' ? 'Todas' : opcao === 'receita' ? 'Receitas' : 'Despesas';
-
-            return (
-              <TouchableOpacity
-                key={opcao}
-                onPress={() => handleMudarFiltro(opcao)}
-                activeOpacity={0.82}
-                style={{
-                  height: 44,
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 14,
-                  backgroundColor: ativo ? '#0F172A' : 'transparent',
-
-                  shadowColor: ativo ? '#000' : 'transparent',
-                  shadowOpacity: ativo ? 0.08 : 0,
-                  shadowRadius: ativo ? 8 : 0,
-                  shadowOffset: { width: 0, height: 2 },
-                  elevation: ativo ? 2 : 0,
-                }}
-              >
-                <Text
-                  style={{
-                    color: ativo ? '#FFFFFF' : '#64748B',
-                    fontFamily: ativo ? 'SofiaProBold' : 'SofiaProRegular',
-                    fontSize: 12,
-                    lineHeight: 18,
-                  }}
+          <View className="mb-1 flex-row rounded-[22px] border border-slate-200 bg-white p-1.5">
+            {(['despesa', 'receita'] as const).map((opcao) => {
+              const ativo = tipo === opcao;
+              return (
+                <Pressable
+                  key={opcao}
+                  onPress={() => setTipo(opcao)}
+                  className={
+                    ativo
+                      ? 'h-12 flex-1 items-center justify-center rounded-2xl bg-slate-950'
+                      : 'h-12 flex-1 items-center justify-center rounded-2xl bg-transparent'
+                  }
                 >
-                  {titulo}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+                  <AppText
+                    variant="caption"
+                    weight={ativo ? 'bold' : 'regular'}
+                    className={ativo ? 'text-white' : 'text-slate-500'}
+                  >
+                    {opcao === 'despesa' ? 'Despesa' : 'Receita'}
+                  </AppText>
+                </Pressable>
+              );
+            })}
+          </View>
 
-        {erro ? (
-          <SurfaceCard className="mb-3 rounded-[20px] border-rose-200 bg-rose-50 px-4 py-3">
-            <AppText variant="caption" className="text-rose-700">
-              {erro}
-            </AppText>
-          </SurfaceCard>
-        ) : null}
-      </View>
-
-      <FlatList
-        data={erro ? [] : transacoesFiltradas}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 88, flexGrow: 1 }}
-        ListEmptyComponent={
-          !erro ? (
-            <SurfaceCard className="mt-8 items-center rounded-[22px] border-dashed border-slate-300 px-5 py-10">
-              <Ionicons name="wallet-outline" size={30} color="#64748B" />
-              <AppText variant="subtitle" weight="bold" className="mt-2 text-slate-800">
-                Nenhuma transacao encontrada
+          <View className="mt-3 gap-3">
+            <View className="rounded-[20px] border border-slate-200 bg-white px-3 py-2.5">
+              <AppText variant="caption" className="mb-1 text-slate-500">
+                Descrição
               </AppText>
-              <AppText variant="caption" className="mt-1 text-center text-slate-500">
-                Adicione uma nova transacao para iniciar seu historico financeiro.
+              <TextInput
+                value={descricao}
+                onChangeText={setDescricao}
+                placeholder="Ex: Restaurante"
+                placeholderTextColor="#94A3B8"
+                className="min-h-[26px] text-[15px] text-slate-900"
+                style={{ fontFamily: 'SofiaProRegular' }}
+              />
+            </View>
+
+            <View className="rounded-[20px] border border-slate-200 bg-white px-3 py-2.5">
+              <AppText variant="caption" className="mb-1 text-slate-500">
+                Valor
+              </AppText>
+              <TextInput
+                value={valorTexto}
+                onChangeText={(texto) => {
+                  setValorTexto(formatarValor(texto));
+                }}
+                placeholder="R$ 0,00"
+                placeholderTextColor="#94A3B8"
+                keyboardType="numeric"
+                className="min-h-[26px] text-[15px] text-slate-900"
+                style={{ fontFamily: 'SofiaProRegular' }}
+              />
+            </View>
+
+            <View className="rounded-[20px] border border-slate-200 bg-white px-3 py-2.5">
+              <AppText variant="caption" className="mb-1 text-slate-500">
+                Categoria (opcional)
+              </AppText>
+              <TextInput
+                value={categoria}
+                onChangeText={setCategoria}
+                placeholder="Ex: Alimentacao"
+                placeholderTextColor="#94A3B8"
+                className="min-h-[26px] text-[15px] text-slate-900"
+                style={{ fontFamily: 'SofiaProRegular' }}
+              />
+            </View>
+          </View>
+
+          {erro ? (
+            <SurfaceCard className="mt-3 rounded-[18px] border-rose-200 bg-rose-50 px-3 py-2.5">
+              <AppText variant="caption" className="text-rose-700">
+                {erro}
               </AppText>
             </SurfaceCard>
-          ) : null
-        }
-        initialNumToRender={8}
-        maxToRenderPerBatch={8}
-        windowSize={5}
-        removeClippedSubviews
-      />
+          ) : null}
 
-      <Modal
-        visible={!!transacaoSelecionada}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setTransacaoSelecionada(null)}
-      >
-        <View style={{
-          flex: 1,
-          justifyContent: 'center',
-          paddingHorizontal: 20,
-          backgroundColor: 'rgba(0,0,0,0.30)',
-        }}>
-          <SurfaceCard className="rounded-[28px] px-5 py-5">
-            <View className="items-center">
+          <ActionButton
+            onPress={handleSalvarTransacao}
+            loading={salvando}
+            label={salvando ? 'Salvando...' : 'Salvar transacao'}
+            className="mt-5 min-h-[56px] rounded-[20px]"
+          />
 
-              <AppText variant="title" weight="bold" className="mt-1 text-center text-slate-950">
-                {transacaoSelecionada?.descricao}
-              </AppText>
-
-              <AppText
-                variant="display"
-                weight="bold"
-                className={
-                  transacaoSelecionada?.tipo === 'receita'
-                    ? 'mt-3 text-emerald-600'
-                    : 'mt-3 text-rose-600'
-                }
-              >
-                {transacaoSelecionada ? formatarMoeda(transacaoSelecionada.valor) : ''}
-              </AppText>
-            </View>
-
-            <View className="mt-5 rounded-[20px] bg-slate-50 px-4 py-3">
-              <View className="flex-row items-center justify-between">
-                <AppText variant="caption" className="text-slate-500">
-                  Tipo
-                </AppText>
-                <AppText variant="caption" weight="bold" className="text-slate-800">
-                  {transacaoSelecionada?.tipo === 'receita' ? 'Receita' : 'Despesa'}
-                </AppText>
-              </View>
-
-              <View className="mt-3 flex-row items-center justify-between">
-                <AppText variant="caption" className="text-slate-500">
-                  Categoria
-                </AppText>
-                <AppText variant="caption" weight="bold" className="text-slate-800">
-                  {transacaoSelecionada?.categoria || 'Sem categoria'}
-                </AppText>
-              </View>
-            </View>
-
-            <ActionButton
-              label="Excluir transação"
-              icon={<Ionicons name="trash-outline" size={18} color="#FFFFFF" />}
-              className="mt-5 bg-rose-600"
-              onPress={() => {
-                handleExcluirTransacao()
-              }}
-            />
-
-            <ActionButton
-              label="Fechar"
-              variant="ghost"
-              className="mt-2"
-              onPress={() => setTransacaoSelecionada(null)}
-            />
-          </SurfaceCard>
-        </View>
-      </Modal>
+          <ActionButton onPress={() => router.back()} variant="ghost" label="Cancelar" className="mt-2" />
+        </SurfaceCard>
+      </ScrollView>
     </SafeAreaView>
   );
 }
