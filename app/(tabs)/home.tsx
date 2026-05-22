@@ -182,15 +182,22 @@ export default function Home() {
             )}
           </Pressable>
 
-          <View className="mb-4 mt-1 flex-row items-center justify-between px-1">
-            <AppText weight="bold" className="text-[18px] text-slate-900">
+          <View className="mb-3 mt-2 flex-row items-center justify-between px-1">
+            <AppText weight="bold" className="text-[17px] text-slate-900">
               Atividade recente
             </AppText>
 
-            <Pressable>
-              <AppText weight="bold" className="text-[14px] text-emerald-600">
-                Ver todas
-              </AppText>
+            <Pressable
+              hitSlop={8}
+              className="rounded-full px-2.5 py-1"
+              style={({ pressed }) => [{ opacity: pressed ? 0.72 : 1 }]}
+            >
+              <View className="flex-row items-center">
+                <AppText weight="bold" className="text-[13px] text-emerald-600">
+                  Ver todas
+                </AppText>
+                <Ionicons name="chevron-forward" size={14} color="#059669" style={{ marginLeft: 2 }} />
+              </View>
             </Pressable>
           </View>
 
