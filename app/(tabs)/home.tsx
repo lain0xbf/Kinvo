@@ -43,8 +43,8 @@ export default function Home() {
   }
 
   const resumo = useMemo(() => calcularResumoFinanceiro(transacoes), [transacoes]);
-  const ultimaMovimentacao = useMemo(() => obterUltimaTransacao(transacoes), [transacoes]);
-
+/*   const ultimaMovimentacao = useMemo(() => obterUltimaTransacao(transacoes), [transacoes]);
+ */
   const movimentacoesRecentes = useMemo(() => {
     return [...transacoes]
       .sort(
@@ -55,7 +55,7 @@ export default function Home() {
       .slice(0, 5);
   }, [transacoes]);
 
-  const saldoPositivo = resumo.saldo >= 0;
+/*   const saldoPositivo = resumo.saldo >= 0; */
 
   if (!fontsLoaded || !authResolvida || !userId || carregando || !carregouImagem) {
     return <LoadingScreen />;
