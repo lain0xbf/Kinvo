@@ -1,7 +1,7 @@
 import { Text, type TextProps } from 'react-native';
 import { cn } from '@/utils/cn';
 
-type TextVariant = 'display' | 'title' | 'subtitle' | 'body' | 'caption' | 'label' | 'subcaption' | 'categoria';
+type TextVariant = 'display' | 'title' | 'subtitle' | 'body' | 'caption' | 'label' | 'subcaption' | 'categoria' | 'screenTitle' | 'screenSubtitle' | 'fieldLabel' | 'amount' | 'inputValue';
 type TextWeight = 'regular' | 'bold';
 type TextFamily = 'sofia' | 'inter';
 
@@ -21,6 +21,11 @@ const variantClasses: Record<TextVariant, string> = {
   categoria: 'text-[12px] leading-[18px]',
   caption: 'text-[12px] leading-[18px]',
   label: 'text-[11px] uppercase tracking-[1px] leading-[16px]',
+  screenTitle: 'text-[22px] leading-[28px]',
+  screenSubtitle: 'text-[13px] leading-[18px]',
+  fieldLabel: 'text-[14px] leading-[20px]',
+  amount: 'text-[22px] leading-[28px]',
+  inputValue: 'text-[36px] leading-[40px]',
 };
 
 const fontByFamilyAndWeight: Record<TextFamily, Record<TextWeight, string>> = {

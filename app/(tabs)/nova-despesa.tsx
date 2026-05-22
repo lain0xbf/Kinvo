@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { ImageBackground, Pressable, ScrollView, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { criarTransacaoParaUsuario, type TipoTransacao } from '@/services/transactions';
 import { escutarUsuarioAutenticado } from '@/services/auth';
 import { AppText } from '@/components/ui/app-text';
-import { ActionButton } from '@/components/ui/action-button';
 import { LoadingScreen } from '@/components/ui/loading-screen';
 import { SurfaceCard } from '@/components/ui/surface-card';
 import { useAppFonts } from '@/hooks/use-app-fonts';
 import { Ionicons } from '@expo/vector-icons';
+import { FormField } from '@/components/FormField';
 
 const fundo2 = require('../../assets/button.png');
 
@@ -28,14 +28,66 @@ const categorias = [
 
 function formatarValor(texto: string) {
   const numero = texto.replace(/\D/g, '');
-
   const valor = Number(numero) / 100;
 
   return valor.toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   });
 }
+
+function CategoryOption({
+  nome,
+  icon,
+  ativo,
+  onPress,
+}: {
+  nome: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  ativo: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      hitSlop={6}
+      accessibilityRole="button"
+      accessibilityLabel={`Categoria ${nome}`}
+      accessibilityState={{ selected: ativo }}
+      className="mb-4 w-1/5 items-center px-1"
+      style={({ pressed }) => [
+        {
+          opacity: pressed ? 0.72 : 1,
+          transform: [{ scale: pressed ? 0.96 : 1 }],
+        },
+      ]}
+    >
+      <View
+        className={
+          ativo
+            ? 'h-12 w-12 items-center justify-center rounded-full border border-emerald-300 bg-emerald-50'
+            : 'h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white'
+        }
+      >
+        <Ionicons name={icon} size={21} color={ativo ? '#059669' : '#64748B'} />
+      </View>
+
+      <AppText
+        family="sofia"
+        weight={ativo ? 'bold' : 'regular'}
+        numberOfLines={1}
+        className={
+          ativo
+            ? 'mt-1.5 max-w-[54px] text-center text-[11px] leading-[14px] text-emerald-700'
+            : 'mt-1.5 max-w-[54px] text-center text-[11px] leading-[14px] text-slate-500'
+        }
+      >
+        {nome}
+      </AppText>
+    </Pressable>
+  );
+}
+
 
 export default function NovaDespesa() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -46,6 +98,9 @@ export default function NovaDespesa() {
   const [erro, setErro] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [fontsLoaded] = useAppFonts();
+
+  const insets = useSafeAreaInsets();
+
 
   const router = useRouter();
 
@@ -111,24 +166,27 @@ export default function NovaDespesa() {
         bounces={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
-          paddingHorizontal: 24,
-          paddingTop: 20,
-          paddingBottom: 120,
+          paddingHorizontal: 20,
+          paddingTop: 12,
+          paddingBottom: Math.max(120, insets.bottom + 88),
+
         }}
       >
-        <View className="mb-4 h-[64px] items-center justify-center">
+        <View className="mb-4 h-[76px] items-center justify-center">
           <Pressable
             onPress={() => router.back()}
+            accessibilityRole="button"
+            accessibilityLabel="Voltar"
             className="absolute left-0 h-12 w-12 items-center justify-center rounded-full border border-slate-100 bg-white"
           >
             <Ionicons name="arrow-back" size={22} color="#0F172A" />
           </Pressable>
 
-          <AppText className="text-center text-[20px] text-slate-950" style={{ fontFamily: 'InterBold' }}>
+          <AppText variant='screenTitle' family='sofia' weight='bold' className="text-center text-slate-950">
             Nova transação
           </AppText>
 
-          <AppText variant='subcaption' className="mt-1 text-center text-slate-500" style={{ fontFamily: 'InterRegular' }}>
+          <AppText variant="screenSubtitle" weight='regular' family='inter' className="mt-1 text-center text-slate-500">
             Adicione um lançamento
           </AppText>
         </View>
@@ -140,22 +198,19 @@ export default function NovaDespesa() {
               <Pressable
                 key={opcao}
                 onPress={() => setTipo(opcao)}
-                className={
-                  ativo
-                    ? tipo === 'despesa'
-                      ? 'h-12 flex-1 items-center justify-center rounded-2xl bg-rose-50'
-                      : 'h-12 flex-1 items-center justify-center rounded-2xl bg-emerald-50'
-                    : 'h-12 flex-1 items-center justify-center rounded-2xl bg-transparent'
-                }
+                accessibilityRole="button"
+                accessibilityLabel={opcao === 'despesa' ? 'Selecionar despesa' : 'Selecionar receita'}
+                accessibilityState={{ selected: ativo }}
+                className={ativo ? 'h-12 flex-1 items-center justify-center rounded-2xl bg-emerald-50' : 'h-12 flex-1 items-center justify-center rounded-2xl bg-transparent'}
               >
                 <AppText
-                  variant="caption"
-                  style={{ fontFamily: ativo ? 'InterBold' : 'InterRegular' }}
-                  className={ativo
-                    ? tipo === 'despesa'
-                      ? 'text-rose-600'
-                      : 'text-emerald-600'
-                    : 'text-slate-500'}
+                  family="inter"
+                  weight={ativo ? 'bold' : 'regular'}
+                  className={
+                    ativo
+                      ? 'text-[13px] leading-[18px] text-emerald-700'
+                      : 'text-[13px] leading-[18px] text-slate-500'
+                  }
                 >
                   {opcao === 'despesa' ? 'Despesa' : 'Receita'}
                 </AppText>
@@ -165,110 +220,70 @@ export default function NovaDespesa() {
         </View>
 
         <View className="mt-3">
-          <AppText className="mt-4 text-[16px] text-slate-500" style={{ fontFamily: 'InterRegular' }}>
+          <AppText variant="fieldLabel" family="inter" className="text-slate-500">
             Valor
           </AppText>
 
-          <View className="h-[88px] mt-3 flex-row items-center rounded-[24px] border border-slate-200 bg-white px-6">
+          <SurfaceCard variant="control" className="mt-3 h-[96px] flex-row items-center px-6">
+            <AppText
+              family="inter"
+              weight="bold"
+              className="mr-2 text-[26px] leading-[30px] text-slate-400"
+            >
+              R$
+            </AppText>
+
             <TextInput
               value={valorTexto}
               onChangeText={(texto) => setValorTexto(formatarValor(texto))}
-              placeholder="R$ 0,00"
+              placeholder="0,00"
               placeholderTextColor="#9CA3AF"
               keyboardType="numeric"
-              className="flex-1 text-[34px] text-slate-950"
+              className="flex-1 text-[36px] leading-[40px] text-slate-950"
               style={{
-                fontFamily: 'InterRegular',
+                fontFamily: 'InterBold',
                 padding: 0,
+                includeFontPadding: false,
               }}
             />
-            <View className="h-10 w-10 items-center justify-center rounded-2xl border border-slate-100 bg-slate-50">
+
+            <View className="h-11 w-11 items-center justify-center rounded-2xl border border-slate-100 bg-slate-50">
               <Ionicons name="calculator-outline" size={20} color="#10B981" />
             </View>
-          </View>
+          </SurfaceCard>
 
-          <AppText className="mt-4 text-[16px] text-slate-500" style={{ fontFamily: 'InterRegular' }}>
-            Descrição
-          </AppText>
-          <View className="h-16 mt-3 flex-row items-center rounded-[24px] border border-slate-200 bg-white px-5">
-            <Ionicons name="document-text-outline" size={22} color="#64748B" />
+          <FormField
+            label="Descrição"
+            leftIcon={<Ionicons name="document-text-outline" size={22} color="#64748B" />}
+          >
             <TextInput
               value={descricao}
               onChangeText={setDescricao}
               placeholder="Adicione uma descrição"
               placeholderTextColor="#94A3B8"
-              className="ml-4 flex-1 text-[17px] text-slate-900"
-              style={{ fontFamily: 'InterRegular' }}
+              className="text-[16px] text-slate-900"
+              style={{ fontFamily: 'InterRegular', padding: 0 }}
             />
-          </View>
+          </FormField>
 
-          <AppText className="mt-4 text-[16px] text-slate-500" style={{ fontFamily: 'InterRegular' }}>
+
+
+          <AppText variant="fieldLabel" family="inter" className="mt-4 text-slate-500">
             Categoria
           </AppText>
 
-          <View className="h-16 mt-3 flex-row items-center rounded-[24px] border border-slate-200 bg-white px-5">
-            <View className="h-10 w-10 items-center justify-center rounded-full bg-emerald-500">
-              <Ionicons name="cart-outline" size={22} color="#FFFFFF" />
-            </View>
-
-            <AppText className="ml-4 flex-1 text-[16px] text-slate-700" style={{ fontFamily: 'InterRegular' }}>
-              {categoria || 'Selecione uma categoria'}
-            </AppText>
+          <View className="mt-3 flex-row flex-wrap">
+            {categorias.map((item) => (
+              <CategoryOption
+                key={item.nome}
+                nome={item.nome}
+                icon={item.icon}
+                ativo={categoria === item.nome}
+                onPress={() => setCategoria(item.nome)}
+              />
+            ))}
           </View>
 
-          <View className="mt-4 flex-row flex-wrap">
-            {categorias.map((item) => {
-              const ativo = categoria === item.nome;
-
-              return (
-                <Pressable
-                  key={item.nome}
-                  onPress={() => setCategoria(item.nome)}
-                  className="mb-3 w-1/5 items-center"
-                >
-                  <View
-                    className={
-                      ativo
-                        ? 'h-12 w-12 items-center justify-center rounded-full border border-emerald-300 bg-emerald-50'
-                        : 'h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white'
-                    }
-                  >
-                    <Ionicons
-                      name={item.icon}
-                      size={20}
-                      color={ativo ? '#10B981' : '#64748B'}
-                    />
-                  </View>
-
-                  <AppText
-                    variant="categoria"
-                    className={
-                      ativo
-                        ? 'mt-1 text-center text-emerald-600'
-                        : 'mt-1 text-center text-slate-500'
-                    }
-                    style={{ fontFamily: 'InterRegular' }}
-                  >
-                    {item.nome}
-                  </AppText>
-                </Pressable>
-              );
-            })}
-          </View>
-
-          {/*           <View className="rounded-[20px] border border-slate-200 bg-white px-3 py-2.5">
-            <AppText variant="caption" className="mb-1 text-slate-500">
-              Categoria (opcional)
-            </AppText>
-            <TextInput
-              value={categoria}
-              onChangeText={setCategoria}
-              placeholder="Ex: Alimentacao"
-              placeholderTextColor="#94A3B8"
-              className="min-h-[26px] text-[15px] text-slate-900"
-              style={{ fontFamily: 'SofiaProRegular' }}
-            />
-          </View> */}
         </View>
 
         {erro ? (
@@ -282,29 +297,43 @@ export default function NovaDespesa() {
         <Pressable
           onPress={handleSalvarTransacao}
           disabled={salvando}
-          className="mt-8 mb-10 overflow-hidden rounded-[28px]"
+          accessibilityRole="button"
+          accessibilityLabel={salvando ? 'Salvando transação' : 'Salvar transação'}
+          className={`mt-8 mb-10 overflow-hidden rounded-[24px] ${salvando ? 'opacity-70' : ''}`}
         >
-          <ImageBackground
-            source={fundo2}
-            resizeMode="cover"
-            className="h-[74px] items-center justify-center"
-            imageStyle={{
-              borderRadius: 28,
-              transform: [{ scale: 1.08 }],
-            }}
-          >
-            <View className="absolute inset-0 bg-black/5" />
+          {({ pressed }) => (
+            <ImageBackground
+              source={fundo2}
+              resizeMode="cover"
+              className="h-[66px] flex-row items-center rounded-[24px] px-4"
+              imageStyle={{
+                borderRadius: 24,
+                transform: [{ scale: pressed ? 1.08 : 1.12 }],
+              }}
+            >
+              <View className={`absolute inset-0 ${pressed ? 'bg-black/20' : 'bg-black/5'}`} />
 
+              <View className="h-10 w-10 items-center justify-center rounded-[14px] bg-white">
+                <Ionicons
+                  name={salvando ? 'hourglass-outline' : 'checkmark'}
+                  size={22}
+                  color="#10B981"
+                />
+              </View>
 
+              <View className="ml-3 flex-1">
+                <AppText family="sofia" weight="bold" className="text-[17px] text-white">
+                  {salvando ? 'Salvando...' : 'Salvar transação'}
+                </AppText>
 
-              <AppText
-                style={{ fontFamily: 'InterBold' }}
-                className="text-[17px] text-white text-center"
-              >
-                {salvando ? 'Salvando...' : 'Salvar transação'}
-              </AppText>
+                <AppText family="sofia" className="mt-0.5 text-[12px] text-white/75">
+                  Registrar lançamento na carteira
+                </AppText>
+              </View>
 
-          </ImageBackground>
+              <Ionicons name="chevron-forward" size={20} color="#FFFFFFCC" />
+            </ImageBackground>
+          )}
         </Pressable>
 
       </ScrollView>
