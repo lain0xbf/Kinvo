@@ -70,7 +70,7 @@ export default function TabsLayout() {
       />
 
       <Tabs.Screen
-        name="extrato"
+        name="relatorios"
         options={{
           title: 'Transações',
           tabBarIcon: ({ color, focused }) => (
@@ -126,9 +126,9 @@ export default function TabsLayout() {
       />
 
       <Tabs.Screen
-        name="relatorios"
+        name="extrato"
         options={{
-          title: 'Relatórios',
+          title: 'Extrato',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'bar-chart' : 'bar-chart-outline'}

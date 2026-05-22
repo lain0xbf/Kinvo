@@ -35,28 +35,28 @@ export const TransactionRow = memo(function TransactionRow({
 
       <View className="ml-4 flex-1">
         <AppText
+        family='inter'
           weight="bold"
-          className="text-[15px] text-slate-900"
+          variant='body'
+          className="text-slate-900"
           numberOfLines={1}
         >
           {item.descricao}
         </AppText>
 
         <View className="mt-1 flex-row items-center">
-          <View className={`mr-1.5 h-1.5 w-1.5 rounded-full ${corBolinha}`} />
-
-          <AppText className="text-[13px] text-slate-500" numberOfLines={1}>
+          <AppText family="inter" weight="regular" variant='subcaption' className="text-slate-500" numberOfLines={1}>
             {item.categoria}
           </AppText>
         </View>
       </View>
 
       <View className="ml-3 items-end">
-        <AppText weight="bold" className={`text-[15px] ${corValor}`}>
+        <AppText family="inter" weight="bold" variant='body' className={`${corValor}`}>
           {sinal} {formatarMoeda(item.valor)}
         </AppText>
 
-        <AppText className="mt-1 text-[13px] text-slate-400">
+        <AppText family="inter" weight="regular" variant='caption' className="mt-1 text-slate-400">
           {dataFormatada}
         </AppText>
       </View>

@@ -91,8 +91,8 @@ export default function Login() {
             paddingHorizontal: 20,
             paddingTop: 12,
             paddingBottom: formFocado
-  ? paddingScrollFocado
-  : Math.max(insets.bottom + 20, 32),
+              ? paddingScrollFocado
+              : Math.max(insets.bottom + 20, 32),
 
           }}
           keyboardShouldPersistTaps="handled"
@@ -177,10 +177,11 @@ export default function Login() {
                     autoCapitalize="none"
                     keyboardType="email-address"
                     autoCorrect={false}
+                    allowFontScaling={false}
                     returnKeyType="next"
-                    className="ml-2.5 flex-1 text-[16px] text-white"
+                    className="ml-2.5 flex-1 text-white"
                     placeholderTextColor="#64748B"
-                    style={{ fontFamily: 'SofiaProRegular' }}
+                    style={{ fontFamily: 'SofiaProRegular', fontSize: 16, lineHeight: 22 }}
                   />
                 </View>
               </View>
@@ -205,13 +206,14 @@ export default function Login() {
                     onBlur={() => setCampoFocado(null)}
                     placeholder="Digite sua senha"
                     secureTextEntry={!mostrarSenha}
+                    allowFontScaling={false}
                     returnKeyType="done"
                     onSubmitEditing={() => {
                       void handleEnviar();
                     }}
-                    className="ml-2.5 flex-1 text-[16px] text-white"
+                    className="ml-2.5 flex-1 text-white"
                     placeholderTextColor="#64748B"
-                    style={{ fontFamily: 'SofiaProRegular' }}
+                    style={{ fontFamily: 'SofiaProRegular', fontSize: 16, lineHeight: 22 }}
                   />
                   <Pressable
                     onPress={() => {
