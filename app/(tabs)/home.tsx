@@ -5,16 +5,16 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { sairDaConta } from '@/services/auth';
 import { AppText } from '@/components/ui/app-text';
-import { ActionButton } from '@/components/ui/action-button';
 import { SurfaceCard } from '@/components/ui/surface-card';
 import { LoadingScreen } from '@/components/ui/loading-screen';
 import { useAppFonts } from '@/hooks/use-app-fonts';
 import { useAuthenticatedTransactions } from '@/hooks/use-authenticated-transactions';
 import { TransactionRow } from '@/components/transactions/transaction-row';
-import { calcularResumoFinanceiro, formatarMoeda, obterUltimaTransacao } from '@/utils/finance';
+import { calcularResumoFinanceiro, formatarMoeda } from '@/utils/finance';
 import { ImageBackground } from 'react-native';
 import { Asset } from 'expo-asset';
 import { LinearGradient } from 'expo-linear-gradient';
+import { auth } from '@/config/firebase';
 
 const fundo = require('../../assets/fundo_card.png');
 const fundo2 = require('../../assets/button.png');
@@ -24,6 +24,9 @@ export default function Home() {
   const [fontsLoaded] = useAppFonts();
   const { authResolvida, carregando, erro, transacoes, userId } = useAuthenticatedTransactions();
   const [carregouImagem, setCarregouImagem] = useState(false);
+
+  const user = auth.currentUser;
+  const nome = user?.displayName?.trim() || user?.email?.split('@')[0] || 'Usuario';
 
   useEffect(() => {
     async function carregarFundo() {
@@ -67,7 +70,7 @@ export default function Home() {
           <View className="mb-5 flex-row items-start justify-between">
             <View className="flex-1 pr-4">
               <AppText family="sofia" weight="bold" className="text-[14px] leading-[20px] text-emerald-600">
-                Olá, Matheus
+                Olá, {nome}
               </AppText>
 
               <AppText family="sofia" weight="bold" className="mt-1 text-[26px] leading-[32px] text-slate-950">
