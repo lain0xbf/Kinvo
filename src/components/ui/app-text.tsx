@@ -3,10 +3,12 @@ import { cn } from '@/utils/cn';
 
 type TextVariant = 'display' | 'title' | 'subtitle' | 'body' | 'caption' | 'label' | 'subcaption' | 'categoria';
 type TextWeight = 'regular' | 'bold';
+type TextFamily = 'sofia' | 'inter';
 
 type AppTextProps = TextProps & {
   variant?: TextVariant;
   weight?: TextWeight;
+  family?: TextFamily;
   className?: string;
 };
 
@@ -21,9 +23,21 @@ const variantClasses: Record<TextVariant, string> = {
   label: 'text-[11px] uppercase tracking-[1px] leading-[16px]',
 };
 
+const fontByFamilyAndWeight: Record<TextFamily, Record<TextWeight, string>> = {
+  sofia: {
+    regular: 'SofiaProRegular',
+    bold: 'SofiaProBold',
+  },
+  inter: {
+    regular: 'InterRegular',
+    bold: 'InterBold',
+  },
+};
+
 export function AppText({
   variant = 'body',
   weight = 'regular',
+  family = 'sofia',
   className,
   style,
   allowFontScaling = true,
@@ -33,7 +47,7 @@ export function AppText({
     <Text
       allowFontScaling={allowFontScaling}
       className={cn(variantClasses[variant], className)}
-      style={[{ fontFamily: weight === 'bold' ? 'SofiaProBold' : 'SofiaProRegular' }, style]}
+      style={[{ fontFamily: fontByFamilyAndWeight[family][weight] }, style]}
       {...props}
     />
   );

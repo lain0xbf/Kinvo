@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -64,26 +64,36 @@ export default function Home() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 96 }}>
         <View className="pb-4 pt-5">
-          <View className="mb-6 flex-row items-end justify-between">
+          <View className="mb-5 flex-row items-start justify-between">
             <View className="flex-1 pr-4">
-              <AppText variant="title" weight="bold" className="mt-1 text-slate-950">
-                Sua carteira
+              <AppText family="sofia" weight="bold" className="text-[14px] leading-[20px] text-emerald-600">
+                Olá, Matheus
               </AppText>
 
-              <AppText variant="caption" className="mt-1 text-slate-500">
-                Controle seus gastos de forma simples
+              <AppText family="sofia" weight="bold" className="mt-1 text-[26px] leading-[32px] text-slate-950">
+                Sua carteira
               </AppText>
             </View>
 
-            <View className="flex-row items-center">
-              <ActionButton
+            <View className="pt-1">
+              <Pressable
                 onPress={handleSair}
-                loading={saindo}
-                variant="secondary"
-                icon={<Ionicons name="log-out-outline" size={18} color="#0F172A" />}
-                className="h-11 w-11 rounded-full border border-slate-200 bg-white"
-                label={''}
-              />
+                disabled={saindo}
+                accessibilityRole="button"
+                accessibilityLabel="Sair da conta"
+                hitSlop={8}
+                className="h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white"
+                style={({ pressed }) => [
+                  { opacity: saindo ? 0.6 : pressed ? 0.78 : 1 },
+                  { transform: [{ scale: pressed ? 0.97 : 1 }] },
+                ]}
+              >
+                {saindo ? (
+                  <ActivityIndicator size="small" color="#334155" />
+                ) : (
+                  <Ionicons name="log-out-outline" size={18} color="#334155" />
+                )}
+              </Pressable>
             </View>
           </View>
 
@@ -108,7 +118,7 @@ export default function Home() {
                 <Ionicons name="eye-off-outline" size={16} color="#CBD5E1" style={{ marginLeft: 6 }} />
               </View>
 
-              <AppText weight="bold" className="mt-2 text-[31px] leading-[35px] text-white">
+              <AppText family='inter' weight='bold' className="mt-2 text-[30px] leading-[35px] text-white">
                 {formatarMoeda(resumo.saldo)}
               </AppText>
 
@@ -120,7 +130,11 @@ export default function Home() {
                   end={{ x: 1, y: 1 }}
                   style={{ paddingHorizontal: 10, paddingVertical: 2 }}
                 >
-                  <AppText weight="regular" className="text-[11px] leading-[15px] text-emerald-200/90">
+                  <AppText
+                    family="inter"
+                    weight="regular"
+                    className="text-[10px] leading-[14px] text-emerald-200/90"
+                  >
                     ▲ 12,5% vs mês anterior
                   </AppText>
                 </LinearGradient>
@@ -131,7 +145,7 @@ export default function Home() {
                 <View className="flex-1">
                   <AppText className="text-[11px] text-slate-300">Entradas</AppText>
 
-                  <AppText weight="bold" className="mt-1 text-[17px] text-emerald-300">
+                  <AppText family="inter" weight="bold" className="mt-1 text-[16px] text-emerald-300">
                     {formatarMoeda(resumo.receitas)}
                   </AppText>
                 </View>
@@ -140,8 +154,7 @@ export default function Home() {
 
                 <View className="flex-1">
                   <AppText className="text-[11px] text-slate-300">Saídas</AppText>
-
-                  <AppText weight="bold" className="mt-1 text-[17px] text-rose-300">
+                  <AppText family="inter" weight="bold" className="mt-1 text-[16px] text-rose-300">
                     {formatarMoeda(resumo.despesas)}
                   </AppText>
                 </View>
