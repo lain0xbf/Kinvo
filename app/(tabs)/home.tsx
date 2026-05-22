@@ -14,6 +14,7 @@ import { TransactionRow } from '@/components/transactions/transaction-row';
 import { calcularResumoFinanceiro, formatarMoeda, obterUltimaTransacao } from '@/utils/finance';
 import { ImageBackground } from 'react-native';
 import { Asset } from 'expo-asset';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const fundo = require('../../assets/fundo_card.png');
 const fundo2 = require('../../assets/button.png');
@@ -26,7 +27,7 @@ export default function Home() {
 
   useEffect(() => {
     async function carregarFundo() {
-      await Asset.fromModule(fundo && fundo2).downloadAsync();
+      await (Asset.fromModule(fundo).downloadAsync(), Asset.fromModule(fundo2).downloadAsync());
       setCarregouImagem(true);
     }
 
@@ -43,19 +44,15 @@ export default function Home() {
   }
 
   const resumo = useMemo(() => calcularResumoFinanceiro(transacoes), [transacoes]);
-/*   const ultimaMovimentacao = useMemo(() => obterUltimaTransacao(transacoes), [transacoes]);
- */
+  /*   const ultimaMovimentacao = useMemo(() => obterUltimaTransacao(transacoes), [transacoes]);
+   */
   const movimentacoesRecentes = useMemo(() => {
     return [...transacoes]
-      .sort(
-        (a, b) =>
-          new Date(b.data).getTime() -
-          new Date(a.data).getTime()
-      )
+      .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
       .slice(0, 5);
   }, [transacoes]);
 
-/*   const saldoPositivo = resumo.saldo >= 0; */
+  /*   const saldoPositivo = resumo.saldo >= 0; */
 
   if (!fontsLoaded || !authResolvida || !userId || carregando || !carregouImagem) {
     return <LoadingScreen />;
@@ -63,7 +60,9 @@ export default function Home() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#F5F7FA]">
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 96 }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 96 }}>
         <View className="pb-4 pt-5">
           <View className="mb-6 flex-row items-end justify-between">
             <View className="flex-1 pr-4">
@@ -81,69 +80,68 @@ export default function Home() {
                 onPress={handleSair}
                 loading={saindo}
                 variant="secondary"
-                icon={<Ionicons
-                  name="log-out-outline"
-                  size={18}
-                  color="#0F172A" />}
-                className="h-11 w-11 rounded-full bg-white border border-slate-200" label={''} />
+                icon={<Ionicons name="log-out-outline" size={18} color="#0F172A" />}
+                className="h-11 w-11 rounded-full border border-slate-200 bg-white"
+                label={''}
+              />
             </View>
           </View>
 
           <SurfaceCard
-            className="mb-5 overflow-hidden rounded-[28px] border border-white/70 bg-white p-0 shadow-[0_12px_40px_rgba(16,185,129,0.12)]"
-          >
+            className="mb-5 overflow-hidden rounded-[28px] border border-cyan-300/40 bg-transparent p-0"
+            style={{
+              shadowColor: '#0891B2',
+              shadowOffset: { width: 0, height: 12 },
+              shadowOpacity: 0.2,
+              shadowRadius: 20,
+              elevation: 10,
+            }}>
             <ImageBackground
-              source={require('../../assets/fundo_card.png')}
-              resizeMode="stretch"
-              className="w-full overflow-hidden rounded-[28px] px-6 pt-6 pb-5"
-              imageStyle={{ borderRadius: 28 }}
-            >
+              source={fundo}
+              resizeMode="cover"
+              className="overflow-hidden rounded-[28px] px-4 pb-5 pt-5"
+              imageStyle={{ borderRadius: 28 }}>
+              <View className="absolute inset-0 bg-slate-950/25" />
 
-              <View className="absolute inset-0 bg-white/5" />
-              <View className="flex-row items-start justify-between">
-                <View className="flex-1">
-                  <AppText className="
-    text-[15px]
-    text-zinc-500
-  ">
-                    Saldo disponível
-                  </AppText>
-
-                  <AppText
-                    weight="bold"
-                    className="mt-2 text-[42px] leading-[46px] tracking-[-1px] text-zinc-900"
-                  >
-                    {formatarMoeda(resumo.saldo)}
-                  </AppText>
-
-                  <View className="mt-3 self-start rounded-full border border-emerald-200 bg-emerald-50/80 px-3.5 py-1.5">
-                    <AppText weight="bold" className="text-[15px] text-emerald-600">
-                      ▲ 12,5% vs mês anterior
-                    </AppText>
-                  </View>
-                </View>
+              <View className="flex-row items-center">
+                <AppText className="text-[12px] text-slate-300">Saldo disponível</AppText>
+                <Ionicons name="eye-off-outline" size={16} color="#CBD5E1" style={{ marginLeft: 6 }} />
               </View>
 
-              <View className="my-5 h-px bg-zinc-200/70" />
+              <AppText weight="bold" className="mt-2 text-[31px] leading-[35px] text-white">
+                {formatarMoeda(resumo.saldo)}
+              </AppText>
+
+
+              <View className="mt-2.5 self-start overflow-hidden rounded-full border border-emerald-300/10">
+                <LinearGradient
+                  colors={['rgba(45,212,191,0.18)', 'rgba(16,185,129,0.10)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{ paddingHorizontal: 10, paddingVertical: 2 }}
+                >
+                  <AppText weight="regular" className="text-[11px] leading-[15px] text-emerald-200/90">
+                    ▲ 12,5% vs mês anterior
+                  </AppText>
+                </LinearGradient>
+              </View>
+              <View className="my-4 h-px bg-white/15" />
+
               <View className="flex-row items-center">
                 <View className="flex-1">
-                  <AppText className="text-[14px] text-zinc-500">
-                    Entradas
-                  </AppText>
+                  <AppText className="text-[11px] text-slate-300">Entradas</AppText>
 
-                  <AppText weight="bold" className="mt-1 text-[20px] text-emerald-700">
+                  <AppText weight="bold" className="mt-1 text-[17px] text-emerald-300">
                     {formatarMoeda(resumo.receitas)}
                   </AppText>
                 </View>
 
-                <View className="mx-4 h-12 w-px bg-zinc-200/70" />
+                <View className="mx-2.5 h-9 w-px bg-white/15" />
 
                 <View className="flex-1">
-                  <AppText className="text-[14px] text-zinc-500">
-                    Saídas
-                  </AppText>
+                  <AppText className="text-[11px] text-slate-300">Saídas</AppText>
 
-                  <AppText weight="bold" className="mt-1 text-[20px] text-rose-500">
+                  <AppText weight="bold" className="mt-1 text-[17px] text-rose-300">
                     {formatarMoeda(resumo.despesas)}
                   </AppText>
                 </View>
@@ -153,45 +151,38 @@ export default function Home() {
 
           <Pressable
             onPress={() => router.push('/nova-despesa')}
-            className="mb-6 mt-2 overflow-hidden rounded-[24px]"
-          >
-            <ImageBackground
-              source={fundo2}
-              resizeMode="cover"
-              className="h-[70px] flex-row items-center rounded-[24px] px-4"
-              imageStyle={{
-                borderRadius: 24,
-                transform: [{ scale: 1.12 }],
-              }}
-            >
-              <View className="absolute inset-0 bg-black/5" />
+            className="mb-6 mt-2 overflow-hidden rounded-[24px]">
+            {({ pressed }) => (
+              <ImageBackground
+                source={fundo2}
+                resizeMode="cover"
+                className="h-[66px] flex-row items-center rounded-[24px] px-4"
+                imageStyle={{
+                  borderRadius: 24,
+                  transform: [{ scale: pressed ? 1.08 : 1.12 }],
+                }}>
+                <View className={`absolute inset-0 ${pressed ? 'bg-black/20' : 'bg-black/5'}`} />
 
-              <View className="h-12 w-12 items-center justify-center rounded-[16px] bg-white">
-                <Ionicons name="add" size={24} color="#10B981" />
-              </View>
+                <View className="h-10 w-10 items-center justify-center rounded-[14px] bg-white">
+                  <Ionicons name="add" size={24} color="#10B981" />
+                </View>
 
-              <View className="ml-4 flex-1">
-                <AppText
-                  weight="bold"
-                  className="text-[18px] text-white"
-                >
-                  Nova transação
-                </AppText>
+                <View className="ml-3 flex-1">
+                  <AppText weight="bold" className="text-[17px] text-white">
+                    Nova transação
+                  </AppText>
 
-                <AppText className="mt-0.5 text-[12px] text-white/75">
-                  Adicionar receita ou despesa
-                </AppText>
-              </View>
+                  <AppText className="mt-0.5 text-[12px] text-white/75">
+                    Adicionar receita ou despesa
+                  </AppText>
+                </View>
 
-              <Ionicons
-                name="chevron-forward"
-                size={24}
-                color="#FFFFFF"
-              />
-            </ImageBackground>
+                <Ionicons name="chevron-forward" size={20} color="#FFFFFFCC" />
+              </ImageBackground>
+            )}
           </Pressable>
 
-          <View className="mb-4 mt-1 px-1 flex-row items-center justify-between">
+          <View className="mb-4 mt-1 flex-row items-center justify-between px-1">
             <AppText weight="bold" className="text-[18px] text-slate-900">
               Atividade recente
             </AppText>
@@ -209,9 +200,7 @@ export default function Home() {
                 key={item.id}
                 item={item}
                 className={
-                  index !== movimentacoesRecentes.length - 1
-                    ? 'border-b border-slate-100'
-                    : ''
+                  index !== movimentacoesRecentes.length - 1 ? 'border-b border-slate-100' : ''
                 }
               />
             ))}
