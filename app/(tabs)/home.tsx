@@ -15,15 +15,20 @@ import { ImageBackground } from 'react-native';
 import { Asset } from 'expo-asset';
 import { LinearGradient } from 'expo-linear-gradient';
 import { auth } from '@/config/firebase';
+import { TransacaoFinanceira } from '@/services/transactions';
+import { TransactionSheet } from '@/components/transactions/transactionSheet';
 
 const fundo = require('../../assets/fundo_card.png');
 const fundo2 = require('../../assets/button.png');
 
 export default function Home() {
+  console.log("Home renderizou");
   const [saindo, setSaindo] = useState(false);
   const [fontsLoaded] = useAppFonts();
   const { authResolvida, carregando, erro, transacoes, userId } = useAuthenticatedTransactions();
   const [carregouImagem, setCarregouImagem] = useState(false);
+  const [transacaoSelecionada, setTransacaoSelecionada] = useState<TransacaoFinanceira | null>(null);
+
 
   const user = auth.currentUser;
   const nome = user?.displayName?.trim() || user?.email?.split('@')[0] || 'Usuario';
@@ -221,13 +226,14 @@ export default function Home() {
 
           <SurfaceCard className="overflow-hidden rounded-[24px] border border-slate-100 bg-white p-0">
             {movimentacoesRecentes.map((item, index) => (
-              <TransactionRow
-                key={item.id}
-                item={item}
-                className={
-                  index !== movimentacoesRecentes.length - 1 ? 'border-b border-slate-100' : ''
-                }
-              />
+              <Pressable key={item.id} onPress={() => setTransacaoSelecionada(item)}>
+                <TransactionRow
+                  item={item}
+                  className={
+                    index !== movimentacoesRecentes.length - 1 ? 'border-b border-slate-100' : ''
+                  }
+                />
+              </Pressable>
             ))}
           </SurfaceCard>
 
@@ -240,6 +246,11 @@ export default function Home() {
           ) : null}
         </View>
       </ScrollView>
+      <TransactionSheet
+        visible={!!transacaoSelecionada}
+        transaction={transacaoSelecionada}
+        onClose={() => setTransacaoSelecionada(null)}
+      />
     </SafeAreaView>
   );
 }

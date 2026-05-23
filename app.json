@@ -2,7 +2,7 @@
   "expo": {
     "name": "kinvo",
     "slug": "kinvo",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "web": {
       "favicon": "./assets/favicon.png"
     },
@@ -31,6 +31,7 @@
     },
     "android": {
       "package": "com.laino.main",
+      "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

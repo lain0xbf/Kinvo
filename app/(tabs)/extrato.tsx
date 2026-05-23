@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, TextInput, View } from 'react-native';
+import { FlatList, Pressable, TextInput, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { excluirTransacaoDoUsuario, type TipoTransacao, type TransacaoFinanceira } from '@/services/transactions';
@@ -9,8 +9,8 @@ import { LoadingScreen } from '@/components/ui/loading-screen';
 import { useAppFonts } from '@/hooks/use-app-fonts';
 import { useAuthenticatedTransactions } from '@/hooks/use-authenticated-transactions';
 import { TransactionRow } from '@/components/transactions/transaction-row';
-import { formatarMoeda } from '@/utils/finance';
-import { ActionButton } from '@/components/ui/action-button';
+import { TransactionSheet } from '@/components/transactions/transactionSheet';
+
 
 type Filtro = 'todas' | TipoTransacao;
 type LinhaExtrato =
@@ -236,7 +236,14 @@ export default function Extrato() {
         removeClippedSubviews
       />
 
-      <Modal
+      <TransactionSheet
+        visible={!!transacaoSelecionada}
+        transaction={transacaoSelecionada}
+        onClose={() => setTransacaoSelecionada(null)}
+        onDelete={handleExcluirTransacao}
+      />
+      
+      {/*       <Modal
         visible={!!transacaoSelecionada}
         transparent
         animationType="slide"
@@ -304,7 +311,7 @@ export default function Extrato() {
             />
           </SurfaceCard>
         </View>
-      </Modal>
+      </Modal> */}
     </SafeAreaView>
   );
 }

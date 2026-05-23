@@ -38,10 +38,10 @@ export default function TabsLayout() {
           borderTopColor: '#F1F5F9',
 
           shadowColor: '#0F172A',
-          shadowOpacity: 0.08,
-          shadowRadius: 18,
-          shadowOffset: { width: 0, height: -6 },
-          elevation: 12,
+          shadowOpacity: 0.05,
+          shadowRadius: 10,
+          shadowOffset: { width: 0, height: -4 },
+          elevation: 6,
         },
 
         tabBarItemStyle: {
@@ -51,7 +51,7 @@ export default function TabsLayout() {
         tabBarLabelStyle: {
           fontSize: 11,
           fontFamily: 'SofiaProBold',
-          marginTop: 1,
+          marginTop: 2,
         },
       }}
     >
@@ -62,7 +62,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'home' : 'home-outline'}
-              size={23}
+              size={24}
               color={color}
             />
           ),
@@ -93,6 +93,10 @@ export default function TabsLayout() {
             <View className="flex-1 items-center">
               <Pressable
                 onPress={onPress}
+                accessibilityRole="button"
+                accessibilityLabel="Nova despesa"
+                accessibilityHint="Abre a tela para adicionar uma nova despesa"
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 style={{
                   position: 'absolute',
                   top: -34,
@@ -111,10 +115,10 @@ export default function TabsLayout() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     shadowColor: '#10B981',
-                    shadowOpacity: 0.18,
-                    shadowRadius: 28,
-                    shadowOffset: { width: 0, height: 12 },
-                    elevation: 16,
+                    shadowOpacity: 0.14,
+                    shadowRadius: 16,
+                    shadowOffset: { width: 0, height: 8 },
+                    elevation: 10,
                   }}
                 >
                   <Ionicons name="add" size={30} color="#FFFFFF" />
@@ -146,7 +150,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'person' : 'person-outline'}
-              size={23}
+              size={24}
               color={color}
             />
           ),
