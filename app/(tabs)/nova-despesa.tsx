@@ -145,6 +145,9 @@ export default function NovaDespesa() {
         categoria,
         tipo,
       });
+      setValorTexto('');
+      setDescricao('');
+      setCategoria('');
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.back();
     } catch {
