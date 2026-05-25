@@ -128,11 +128,11 @@ export default function Home() {
               <View className="absolute inset-0 bg-slate-950/25" />
 
               <View className="flex-row items-center">
-                <AppText className="text-[12px] text-slate-300">Saldo disponível</AppText>
+                <AppText weight='regular' family='inter' variant='caption' className="text-slate-300">Saldo disponível</AppText>
                 <Ionicons name="eye-off-outline" size={16} color="#CBD5E1" style={{ marginLeft: 6 }} />
               </View>
 
-              <AppText family='inter' weight='bold' className="mt-2 text-[30px] leading-[35px] text-white">
+              <AppText family='inter' weight='bold' variant='display' className="mt-2 text-white">
                 {formatarMoeda(resumo.saldo)}
               </AppText>
 
@@ -146,8 +146,9 @@ export default function Home() {
                 >
                   <AppText
                     family="inter"
+                    variant='caption'
                     weight="regular"
-                    className="text-[10px] leading-[14px] text-emerald-200/90"
+                    className="text-emerald-200/90"
                   >
                     ▲ 12,5% vs mês anterior
                   </AppText>
@@ -157,9 +158,9 @@ export default function Home() {
 
               <View className="flex-row items-center">
                 <View className="flex-1">
-                  <AppText className="text-[11px] text-slate-300">Entradas</AppText>
+                  <AppText variant='label' weight='regular' family='inter' className="text-slate-300">Entradas</AppText>
 
-                  <AppText family="inter" weight="bold" className="mt-1 text-[16px] text-emerald-300">
+                  <AppText family="inter" weight="bold" variant='titleCardES' className="mt-1 text-emerald-300">
                     {formatarMoeda(resumo.receitas)}
                   </AppText>
                 </View>
@@ -167,8 +168,8 @@ export default function Home() {
                 <View className="mx-2.5 h-9 w-px bg-white/15" />
 
                 <View className="flex-1">
-                  <AppText className="text-[11px] text-slate-300">Saídas</AppText>
-                  <AppText family="inter" weight="bold" className="mt-1 text-[16px] text-rose-300">
+                  <AppText variant='label' weight='regular' family='inter' className="text-slate-300">Saídas</AppText>
+                  <AppText family="inter" weight="bold" variant='titleCardES' className="mt-1 text-rose-300">
                     {formatarMoeda(resumo.despesas)}
                   </AppText>
                 </View>
@@ -195,11 +196,11 @@ export default function Home() {
                 </View>
 
                 <View className="ml-3 flex-1">
-                  <AppText weight="bold" className="text-[17px] text-white">
+                  <AppText weight="bold" className="text-white" variant='subtitle'>
                     Nova transação
                   </AppText>
 
-                  <AppText className="mt-0.5 text-[12px] text-white/75">
+                  <AppText variant='subcaption' className="mt-0.5 text-white/75">
                     Adicionar receita ou despesa
                   </AppText>
                 </View>
@@ -210,7 +211,7 @@ export default function Home() {
           </Pressable>
 
           <View className="mb-3 mt-2 flex-row items-center justify-between px-1">
-            <AppText weight="bold" className="text-[17px] text-slate-900">
+            <AppText weight="bold" className="text-slate-900" style={{ fontSize: 17, lineHeight: 24 }}>
               Atividade recente
             </AppText>
 
@@ -220,7 +221,7 @@ export default function Home() {
               style={({ pressed }) => [{ opacity: pressed ? 0.72 : 1 }]}
             >
               <View className="flex-row items-center">
-                <AppText weight="bold" className="text-[13px] text-emerald-600">
+                <AppText weight="bold" variant='fieldLabel' className="text-emerald-600">
                   Ver todas
                 </AppText>
                 <Ionicons name="chevron-forward" size={14} color="#059669" style={{ marginLeft: 2 }} />
