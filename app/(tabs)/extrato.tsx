@@ -10,6 +10,7 @@ import { useAppFonts } from '@/hooks/use-app-fonts';
 import { useAuthenticatedTransactions } from '@/hooks/use-authenticated-transactions';
 import { TransactionRow } from '@/components/transactions/transaction-row';
 import { TransactionSheet } from '@/components/transactions/transactionSheet';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 
 type Filtro = 'todas' | TipoTransacao;
@@ -43,7 +44,9 @@ export default function Extrato() {
   const { authResolvida, carregando, erro, transacoes, userId } = useAuthenticatedTransactions();
   const [transacaoSelecionada, setTransacaoSelecionada] = useState<TransacaoFinanceira | null>(null);
   const [busca, setBusca] = useState('');
-  const insets = useSafeAreaInsets();
+
+  const tabBarHeight = useBottomTabBarHeight();
+  const bottomPadding = tabBarHeight + 12; // 12 = respiro visual
 
   function normalizar(valor: string) {
     return valor
@@ -215,7 +218,7 @@ export default function Extrato() {
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 96 }}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: bottomPadding }}
         ListHeaderComponent={listHeader}
         ListEmptyComponent={
           !erro ? (
@@ -242,7 +245,7 @@ export default function Extrato() {
         onClose={() => setTransacaoSelecionada(null)}
         onDelete={handleExcluirTransacao}
       />
-      
+
       {/*       <Modal
         visible={!!transacaoSelecionada}
         transparent

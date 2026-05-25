@@ -17,6 +17,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { auth } from '@/config/firebase';
 import { TransacaoFinanceira } from '@/services/transactions';
 import { TransactionSheet } from '@/components/transactions/transactionSheet';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 const fundo = require('../../assets/fundo_card.png');
 const fundo2 = require('../../assets/button.png');
@@ -29,6 +30,8 @@ export default function Home() {
   const [carregouImagem, setCarregouImagem] = useState(false);
   const [transacaoSelecionada, setTransacaoSelecionada] = useState<TransacaoFinanceira | null>(null);
 
+  const tabBarHeight = useBottomTabBarHeight();
+  const bottomPadding = tabBarHeight + 12; // 12 = respiro visual
 
   const user = auth.currentUser;
   const nome = user?.displayName?.trim() || user?.email?.split('@')[0] || 'Usuario';
@@ -68,11 +71,12 @@ export default function Home() {
     return <LoadingScreen />;
   }
 
+
   return (
     <SafeAreaView className="flex-1 bg-[#F5F7FA]">
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 96 }}>
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: bottomPadding }}>
         <View className="pb-4 pt-5">
           <View className="mb-5 flex-row items-start justify-between">
             <View className="flex-1 pr-4">
@@ -254,3 +258,4 @@ export default function Home() {
     </SafeAreaView>
   );
 }
+
