@@ -3,10 +3,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Asset } from 'expo-asset';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ImageBackground, Pressable, Text, View } from 'react-native';
+import { ImageBackground, Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
+import { AppText } from '@/components/ui/app-text';
 
 const fundo = require('../assets/fundo.webp');
 
@@ -44,13 +45,13 @@ export default function Onboarding() {
             <SafeAreaView className="flex-1">
 
                 <View className="flex-1 justify-end px-6 pb-8">
-                    <Text className="text-4xl font-bold text-white">
+                    <AppText family="sofia" weight="bold" variant="display" className="text-white">
                         Controle seu dinheiro
-                    </Text>
+                    </AppText>
 
-                    <Text className="mt-4 text-base leading-6 text-slate-300">
+                    <AppText family="inter" weight="regular" variant="subLogin" className="mt-4 text-slate-300">
                         Acompanhe seus gastos, defina metas e tenha uma vida financeira mais saudável.
-                    </Text>
+                    </AppText>
 
                     <Pressable
                         onPress={finalizarOnboarding}
@@ -68,15 +69,15 @@ export default function Onboarding() {
                             start={{ x: 0, y: 0.2 }}
                             end={{ x: 1, y: 0.8 }}
                             style={{
-                                paddingVertical: 16,
+                                minHeight: 58,
+                                borderRadius: 24,
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                borderRadius: 999,
                             }}
                         >
-                            <Text className="text-center text-lg font-bold text-slate-950">
+                            <AppText family="sofia" weight="bold" variant="cta" className="text-center text-slate-950">
                                 Vamos começar
-                            </Text>
+                            </AppText>
                         </LinearGradient>
                     </Pressable>
                 </View>

@@ -25,7 +25,7 @@ export default function TabsLayout() {
 
           overflow: 'visible',
 
-          height: 78 + insets.bottom,
+          height: 80 + insets.bottom,
           paddingTop: 12,
           paddingBottom: insets.bottom > 0 ? insets.bottom : 12,
 
@@ -49,8 +49,9 @@ export default function TabsLayout() {
         },
 
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontFamily: 'SofiaProBold',
+          fontSize: 12,
+          lineHeight: 16,
+          fontFamily: 'InterBold',
           marginTop: 2,
         },
       }}
@@ -93,9 +94,6 @@ export default function TabsLayout() {
             <View className="flex-1 items-center">
               <Pressable
                 onPress={onPress}
-                accessibilityRole="button"
-                accessibilityLabel="Nova despesa"
-                accessibilityHint="Abre a tela para adicionar uma nova despesa"
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 style={{
                   position: 'absolute',
@@ -114,14 +112,9 @@ export default function TabsLayout() {
                     borderRadius: 999,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    shadowColor: '#10B981',
-                    shadowOpacity: 0.14,
-                    shadowRadius: 16,
-                    shadowOffset: { width: 0, height: 8 },
-                    elevation: 10,
                   }}
                 >
-                  <Ionicons name="add" size={30} color="#FFFFFF" />
+                  <Ionicons name="add" size={26} color="#FFFFFF" />
                 </LinearGradient>
               </Pressable>
             </View>

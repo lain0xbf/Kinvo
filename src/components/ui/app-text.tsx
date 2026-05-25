@@ -1,7 +1,7 @@
 import { Text, type TextProps } from 'react-native';
 import { cn } from '@/utils/cn';
 
-type TextVariant = 'display' | 'title' | 'subtitle' | 'body' | 'caption' | 'label' | 'subcaption' | 'categoria' | 'titleCardES' | 'screenTitle' | 'screenSubtitle' | 'fieldLabel' | 'amount' | 'inputValue';
+type TextVariant = 'display' | 'title' | 'subtitle' | 'subLogin' | 'body' | 'caption' | 'label' | 'subcaption' | 'cta' | 'categoria' | 'titleCardES' | 'screenTitle' | 'screenSubtitle' | 'fieldLabel' | 'amount' | 'inputValue';
 type TextWeight = 'regular' | 'bold';
 type TextFamily = 'sofia' | 'inter';
 
@@ -17,16 +17,18 @@ const variantClasses: Record<TextVariant, string> = {
   title: 'text-[24px] leading-[30px]',
   subtitle: 'text-[18px] leading-[24px]',
   titleCardES: 'text-[16px] leading-[22px]',
+  subLogin: 'text-[16px] leading-[24px]',
+  cta: 'text-[17px] leading-[24px]',
   body: 'text-[15px] leading-[22px]',
   subcaption: 'text-[13px] leading-[18px]',
-  categoria: 'text-[12px] leading-[18px]',
+  categoria: 'text-[12px] leading-[16px]',
   caption: 'text-[12px] leading-[18px]',
   label: 'text-[11px] uppercase tracking-[1px] leading-[16px]',
   screenTitle: 'text-[22px] leading-[28px]',
   screenSubtitle: 'text-[13px] leading-[18px]',
   fieldLabel: 'text-[14px] leading-[20px]',
   amount: 'text-[22px] leading-[28px]',
-  inputValue: 'text-[36px] leading-[40px]',
+  inputValue: 'text-[26px] leading-[30px]',
 };
 
 const fontByFamilyAndWeight: Record<TextFamily, Record<TextWeight, string>> = {

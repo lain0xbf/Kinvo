@@ -73,13 +73,14 @@ function CategoryOption({
       </View>
 
       <AppText
-        family="sofia"
+        family="inter"
         weight={ativo ? 'bold' : 'regular'}
         numberOfLines={1}
+        variant='categoria'
         className={
           ativo
-            ? 'mt-1.5 max-w-[54px] text-center text-[11px] leading-[14px] text-emerald-700'
-            : 'mt-1.5 max-w-[54px] text-center text-[11px] leading-[14px] text-slate-500'
+            ? 'mt-1.5 max-w-[54px] text-center text-emerald-700'
+            : 'mt-1.5 max-w-[54px] text-center text-slate-500'
         }
       >
         {nome}
@@ -209,10 +210,11 @@ export default function NovaDespesa() {
                 <AppText
                   family="inter"
                   weight={ativo ? 'bold' : 'regular'}
+                  variant='subcaption'
                   className={
                     ativo
-                      ? 'text-[13px] leading-[18px] text-emerald-700'
-                      : 'text-[13px] leading-[18px] text-slate-500'
+                      ? 'text-emerald-700'
+                      : 'text-slate-500'
                   }
                 >
                   {opcao === 'despesa' ? 'Despesa' : 'Receita'}
@@ -231,7 +233,8 @@ export default function NovaDespesa() {
             <AppText
               family="inter"
               weight="bold"
-              className="mr-2 text-[26px] leading-[30px] text-slate-400"
+              variant='inputValue'
+              className="mr-2 text-slate-400"
             >
               R$
             </AppText>
@@ -264,7 +267,7 @@ export default function NovaDespesa() {
               onChangeText={setDescricao}
               placeholder="Adicione uma descrição"
               placeholderTextColor="#94A3B8"
-              className="text-[16px] text-slate-900"
+              className="text-[16px] lineHeight: 22 text-slate-900"
               style={{ fontFamily: 'InterRegular', padding: 0 }}
             />
           </FormField>
@@ -319,17 +322,17 @@ export default function NovaDespesa() {
               <View className="h-10 w-10 items-center justify-center rounded-[14px] bg-white">
                 <Ionicons
                   name={salvando ? 'hourglass-outline' : 'checkmark'}
-                  size={22}
+                  size={24}
                   color="#10B981"
                 />
               </View>
 
               <View className="ml-3 flex-1">
-                <AppText family="sofia" weight="bold" className="text-[17px] text-white">
+                <AppText family="sofia" weight="bold" variant='subtitle' className="text-white">
                   {salvando ? 'Salvando...' : 'Salvar transação'}
                 </AppText>
 
-                <AppText family="sofia" className="mt-0.5 text-[12px] text-white/75">
+                <AppText family="sofia" variant='subcaption' className="mt-0.5 text-white/75">
                   Registrar lançamento na carteira
                 </AppText>
               </View>

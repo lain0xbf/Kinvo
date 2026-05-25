@@ -33,5 +33,5 @@ export default function Index() {
     return <Redirect href="/onboarding" />;
   }
 
-  return <Redirect href={usuario ? '/(tabs)/home' : '/login'} />;
+  return <Redirect href={usuario ? '/(tabs)/home' : '/onboarding'} />;
 }

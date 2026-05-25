@@ -1,15 +1,21 @@
-import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useEffect, useState } from 'react';
+import { Alert, ImageBackground, Pressable, TextInput, useWindowDimensions, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { cadastrarComEmailSenha, entrarComEmailSenha } from '@/services/auth';
-import { ActionButton } from '@/components/ui/action-button';
 import { AppText } from '@/components/ui/app-text';
 import { LoadingScreen } from '@/components/ui/loading-screen';
 import { useAppFonts } from '@/hooks/use-app-fonts';
 import { cn } from '@/utils/cn';
+import { StatusBar } from 'expo-status-bar';
+import { Asset } from 'expo-asset';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { LinearGradient } from 'expo-linear-gradient';
+
+const fundo = require('../assets/fundo_login.webp');
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -19,6 +25,24 @@ export default function Login() {
   const [campoFocado, setCampoFocado] = useState<'email' | 'senha' | null>(null);
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [fontsLoaded] = useAppFonts();
+  const formFocado = campoFocado !== null;
+  const [carregouImagem, setCarregouImagem] = useState(false);
+  const { height } = useWindowDimensions();
+
+  const paddingFormFocado = Math.min(height * 0.06, 56);
+  const paddingScrollFocado = Math.min(height * 0.12, 100)
+  const insets = useSafeAreaInsets();
+
+
+  useEffect(() => {
+    async function carregarFundo() {
+      await Asset.fromModule(fundo).downloadAsync();
+      setCarregouImagem(true);
+    }
+
+    carregarFundo();
+  }, []);
+
 
   async function handleEnviar() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -45,76 +69,105 @@ export default function Login() {
     }
   }
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || !carregouImagem) {
     return <LoadingScreen />;
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-[#F6F7FB]" edges={['top', 'left', 'right']}>
-      <View className="absolute -left-24 top-6 h-56 w-56 rounded-full bg-[#E4ECF8]" />
+    <ImageBackground
+      source={fundo}
+      className="flex-1"
+      resizeMode="cover"
+    >
+      <StatusBar style="light" translucent backgroundColor="transparent" />
+      <View className="absolute inset-0 bg-black/35" />
 
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1">
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingVertical: 20 }}>
-          <View className="flex-1 justify-center">
-            <View className="mb-10">
-              <View className="self-start rounded-full border border-white/80 bg-white px-3 py-2 shadow-sm shadow-slate-900/5">
-                <AppText variant="caption" weight="bold" className="text-slate-800">
+      <SafeAreaView className="flex-1">
+
+        <KeyboardAwareScrollView
+          className="flex-1"
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingHorizontal: 20,
+            paddingTop: 12,
+            paddingBottom: formFocado
+              ? paddingScrollFocado
+              : Math.max(insets.bottom + 20, 32),
+
+          }}
+          keyboardShouldPersistTaps="handled"
+          enableOnAndroid
+          enableAutomaticScroll={false}
+          extraScrollHeight={0}
+          extraHeight={0}
+          scrollEnabled={formFocado}
+          showsVerticalScrollIndicator={false}
+        >
+          <View
+            className={cn(
+              'flex-1 pb-4',
+              formFocado
+                ? 'justify-center pt-2'
+                : 'justify-end pt-2'
+            )}
+            style={formFocado ? { paddingBottom: paddingFormFocado } : undefined}
+          >
+            <View className={cn('px-1 mb-10', formFocado && 'mb-4')}>
+              <View className="flex-row items-center">
+                <View className="mr-2 h-10 w-10 items-center justify-center rounded-2xl bg-emerald-400/15">
+                  <Ionicons name="stats-chart" size={22} color="#34D399" />
+                </View>
+
+                <AppText variant="titleCardES" weight="bold" className="text-white">
                   Kinvo
                 </AppText>
               </View>
 
-              <AppText variant="title" weight="bold" className="mt-3 text-slate-950">
-                {modoCadastro ? 'Crie sua conta' : 'Bem-vindo de volta'}
-              </AppText>
-              <AppText variant="body" className="mt-2 mb-2 max-w-[300px] text-[15px] leading-[23px] text-slate-600">
-                {modoCadastro
-                  ? 'Crie seu acesso em segundos e comece a organizar suas financas.'
-                  : 'Continue seu controle financeiro.'}
-              </AppText>
+              {!formFocado && (
+                <Animated.View
+                  entering={FadeIn.duration(180)}
+                  exiting={FadeOut.duration(120)}
+                >
+                  <AppText weight="bold" className="mt-10 text-[42px] leading-[50px] text-white">
+                    Bem-vindo
+                  </AppText>
+
+                  <AppText weight="bold" className="text-[42px] leading-[50px] text-emerald-400">
+                    de volta
+                  </AppText>
+
+                  <AppText variant='subLogin' weight='regular' family='inter' className="mt-5 max-w-[280px] text-slate-300">
+                    Faça login para continuar{'\n'}
+                    cuidando do seu dinheiro.
+                  </AppText>
+                </Animated.View>
+              )}
             </View>
+            <View className={cn(
+              'rounded-[32px] border border-emerald-400/20 bg-[#020617]/60 px-6 backdrop-blur',
+              formFocado ? 'py-5' : 'py-6'
+            )}>
+              <AppText variant="title" weight="bold" className="text-center text-white">
+                Acesse sua conta
+              </AppText>
 
-            <View className="rounded-[30px] border border-white/80 bg-white px-5 py-5 shadow-sm shadow-slate-900/5">
-
-              <View className="flex-row rounded-[18px] border border-slate-200 bg-slate-100 p-1.5 mt-1">
-                {[
-                  { id: 'login', title: 'Entrar', value: false },
-                  { id: 'cadastro', title: 'Criar conta', value: true },
-                ].map((item) => {
-                  const ativo = modoCadastro === item.value;
-                  return (
-                    <Pressable
-                      key={item.id}
-                      onPress={() => {
-                        void Haptics.selectionAsync();
-                        setModoCadastro(item.value);
-                      }}
-                      accessibilityRole="button"
-                      accessibilityLabel={item.title}
-                      android_ripple={{ color: 'rgba(15, 23, 42, 0.08)' }}
-                      className={cn(
-                        'min-h-[48px] flex-1 items-center justify-center rounded-[14px] active:opacity-85',
-                        ativo ? 'bg-white' : 'bg-transparent'
-                      )}
-                    >
-                      <AppText variant="caption" weight={ativo ? 'bold' : 'regular'} className={ativo ? 'text-slate-900' : 'text-slate-500'}>
-                        {item.title}
-                      </AppText>
-                    </Pressable>
-                  );
-                })}
-              </View>
+              <AppText variant="body" family='inter' className="mt-2 text-center text-slate-400">
+                Entre com seu e-mail e senha para continuar
+              </AppText>
 
               <View className="mt-6">
-                <AppText variant="caption" className="mb-2 text-slate-500">
+                <AppText variant="fieldLabel" family='inter' weight='regular' className="mb-2 text-slate-400">
                   E-mail
                 </AppText>
                 <View
                   className={cn(
-                    'min-h-[56px] flex-row items-center rounded-[18px] border bg-slate-50 px-5',
-                    campoFocado === 'email' ? 'border-slate-900 bg-white' : 'border-slate-200'
+                    'min-h-[60px] flex-row items-center rounded-[18px] border bg-slate-900/80 px-5',
+                    campoFocado === 'email'
+                      ? 'border-emerald-400'
+                      : 'border-white/10'
                   )}
                 >
-                  <Ionicons name="mail-outline" size={18} color={campoFocado === 'email' ? '#0F172A' : '#64748B'} />
+                  <Ionicons name="mail-outline" size={18} color={campoFocado === 'email' ? '#34D399' : '#64748B'} />
                   <TextInput
                     value={email}
                     onChangeText={setEmail}
@@ -124,25 +177,28 @@ export default function Login() {
                     autoCapitalize="none"
                     keyboardType="email-address"
                     autoCorrect={false}
+                    allowFontScaling={false}
                     returnKeyType="next"
-                    className="ml-2.5 flex-1 text-[16px] text-slate-900"
-                    placeholderTextColor="#94A3B8"
-                    style={{ fontFamily: 'SofiaProRegular' }}
+                    className="ml-2.5 flex-1 text-white"
+                    placeholderTextColor="#64748B"
+                    style={{ fontFamily: 'InterRegular', fontSize: 16, lineHeight: 22 }}
                   />
                 </View>
               </View>
 
               <View className="mt-4">
-                <AppText variant="caption" className="mb-2 text-slate-500">
+                <AppText variant="fieldLabel" family='inter' weight='regular' className="mb-2 text-slate-400">
                   Senha
                 </AppText>
                 <View
                   className={cn(
-                    'min-h-[56px] flex-row items-center rounded-[18px] border bg-slate-50 px-5',
-                    campoFocado === 'senha' ? 'border-slate-900 bg-white' : 'border-slate-200'
+                    'min-h-[60px] flex-row items-center rounded-[18px] border bg-slate-900/80 px-5',
+                    campoFocado === 'senha'
+                      ? 'border-emerald-400'
+                      : 'border-white/10'
                   )}
                 >
-                  <Ionicons name="lock-closed-outline" size={18} color={campoFocado === 'senha' ? '#0F172A' : '#64748B'} />
+                  <Ionicons name="lock-closed-outline" size={18} color={campoFocado === 'senha' ? '#34D399' : '#64748B'} />
                   <TextInput
                     value={senha}
                     onChangeText={setSenha}
@@ -150,13 +206,14 @@ export default function Login() {
                     onBlur={() => setCampoFocado(null)}
                     placeholder="Digite sua senha"
                     secureTextEntry={!mostrarSenha}
+                    allowFontScaling={false}
                     returnKeyType="done"
                     onSubmitEditing={() => {
                       void handleEnviar();
                     }}
-                    className="ml-2.5 flex-1 text-[16px] text-slate-900"
-                    placeholderTextColor="#94A3B8"
-                    style={{ fontFamily: 'SofiaProRegular' }}
+                    className="ml-2.5 flex-1 text-white"
+                    placeholderTextColor="#64748B"
+                    style={{ fontFamily: 'InterRegular', fontSize: 16, lineHeight: 22 }}
                   />
                   <Pressable
                     onPress={() => {
@@ -165,30 +222,79 @@ export default function Login() {
                     }}
                     accessibilityRole="button"
                     accessibilityLabel={mostrarSenha ? 'Ocultar senha' : 'Mostrar senha'}
-                    android_ripple={{ color: 'rgba(15, 23, 42, 0.08)', borderless: true }}
+                    android_ripple={{ color: 'rgba(255,255,255,0.08)', borderless: true }}
                     className="ml-2 min-h-[44px] min-w-[44px] items-center justify-center rounded-full"
                   >
                     <Ionicons name={mostrarSenha ? 'eye-off-outline' : 'eye-outline'} size={18} color="#64748B" />
                   </Pressable>
                 </View>
-
-                <View className="mt-3 flex-row items-center justify-between">
-                  <AppText variant="caption" className="text-slate-500">
-                    {modoCadastro ? 'Use pelo menos 6 caracteres.' : 'Seus dados ficam protegidos no dispositivo.'}
-                  </AppText>
-                </View>
               </View>
 
-              <ActionButton
+              <Pressable
                 onPress={handleEnviar}
-                loading={carregando}
-                label={modoCadastro ? 'Criar e entrar' : 'Entrar'}
-                className="mt-6 min-h-[56px] rounded-[18px] shadow-sm shadow-slate-900/10"
-              />
+                disabled={carregando}
+                className={cn(
+                  'mt-6 min-h-[58px] overflow-hidden rounded-[24px]',
+                  carregando && 'opacity-70'
+                )}
+                style={{
+                  shadowColor: '#10B981',
+                  shadowOffset: {
+                    width: 0,
+                    height: 10,
+                  },
+                  shadowOpacity: 0.22,
+                  shadowRadius: 20,
+                  elevation: 10,
+                }}
+              >
+                <LinearGradient
+                  colors={['#2DD4BF', '#10B981', '#047857']}
+                  start={{ x: 0, y: 0.2 }}
+                  end={{ x: 1, y: 0.8 }}
+                  style={{
+                    minHeight: 58,
+                    borderRadius: 24,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+
+                  <AppText
+                    weight="bold"
+                    variant='cta'
+                    className="text-slate-950"
+                  >
+                    {carregando
+                      ? 'Entrando...'
+                      : modoCadastro
+                        ? 'Criar conta'
+                        : 'Entrar'}
+                  </AppText>
+                </LinearGradient>
+              </Pressable>
+
+              <View className="mt-6 flex-row items-center justify-center">
+                <AppText family='inter' className="text-slate-400">
+                  {modoCadastro ? 'Já tem uma conta?' : 'Ainda não tem uma conta?'}
+                </AppText>
+
+                <Pressable
+                  onPress={() => {
+                    void Haptics.selectionAsync();
+                    setModoCadastro((valorAtual) => !valorAtual);
+                  }}
+                  className="ml-2"
+                >
+                  <AppText weight="bold" family='inter' className="text-emerald-400">
+                    {modoCadastro ? 'Entrar' : 'Criar conta'}
+                  </AppText>
+                </Pressable>
+              </View>
             </View>
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        </KeyboardAwareScrollView>
+      </SafeAreaView >
+    </ImageBackground >
   );
 }
