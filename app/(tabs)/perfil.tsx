@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,8 @@ import { LoadingScreen } from '@/components/ui/loading-screen';
 import { useAppFonts } from '@/hooks/use-app-fonts';
 import { useAuthenticatedTransactions } from '@/hooks/use-authenticated-transactions';
 import { calcularResumoFinanceiro, formatarMoeda } from '@/utils/finance';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+
 
 type MenuItemProps = {
   icon: keyof typeof Ionicons.glyphMap;
@@ -78,6 +80,10 @@ export default function Perfil() {
   const [saindo, setSaindo] = useState(false);
   const { authResolvida, carregando, transacoes, userId } = useAuthenticatedTransactions();
 
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
+
+
   const user = auth.currentUser;
   const nome = user?.displayName?.trim() || user?.email?.split('@')[0] || 'Usuario';
   const email = user?.email || 'Email nao disponivel';
@@ -119,11 +125,14 @@ export default function Perfil() {
     return <LoadingScreen />;
   }
 
+  const bottomPadding = tabBarHeight + 12; // 12 = respiro visual
+
+
   return (
-    <SafeAreaView className="flex-1 bg-[#F5F7FA]" edges={['top', 'left', 'right']}>
+    <SafeAreaView className="flex-1 bg-[#F5F7FA]" edges={['top', 'left', 'right', 'bottom']}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 96 }}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: bottomPadding }}
       >
         <View className="pb-4 pt-5">
           <View className="mb-5 flex-row items-center justify-between">

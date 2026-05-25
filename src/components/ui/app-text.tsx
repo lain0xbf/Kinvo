@@ -45,7 +45,7 @@ export function AppText({
   family = 'sofia',
   className,
   style,
-  allowFontScaling = true,
+  allowFontScaling = false,
   ...props
 }: AppTextProps) {
   return (
