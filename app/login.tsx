@@ -30,7 +30,8 @@ export default function Login() {
   const { height } = useWindowDimensions();
 
   const paddingFormFocado = Math.min(height * 0.06, 56);
-  const paddingScrollFocado = Math.min(height * 0.12, 100)
+  // const paddingScrollFocado = Math.min(height * 0.12, 100)
+  const paddingScrollFocado = Math.max(56, Math.min(height * 0.12, 100));
   const insets = useSafeAreaInsets();
 
 
@@ -92,7 +93,7 @@ export default function Login() {
             paddingTop: 12,
             paddingBottom: formFocado
               ? paddingScrollFocado
-              : Math.max(insets.bottom + 20, 32),
+              : Math.max(insets.bottom + 20, 36),
 
           }}
           keyboardShouldPersistTaps="handled"
