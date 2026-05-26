@@ -105,6 +105,9 @@ export default function NovaDespesa() {
 
   const router = useRouter();
 
+
+  const botaoDesabilitado = salvando || valorTexto.trim() === '';
+
   useEffect(() => {
     const cancelar = escutarUsuarioAutenticado((usuario) => {
       if (!usuario) {
@@ -164,7 +167,7 @@ export default function NovaDespesa() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-[#F5F7FA]" edges={['top', 'left', 'right']}>
+    <SafeAreaView className="flex-1 bg-[#F5F7FA]" edges={['top', 'left', 'right', 'bottom']}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         bounces={false}
@@ -176,7 +179,7 @@ export default function NovaDespesa() {
 
         }}
       >
-        <View className="mb-4 h-[76px] items-center justify-center">
+        <View className="mb-4 h-[76px] items-center justify-center py-2">
           <Pressable
             onPress={() => router.back()}
             accessibilityRole="button"
@@ -229,11 +232,12 @@ export default function NovaDespesa() {
             Valor
           </AppText>
 
-          <SurfaceCard variant="control" className="mt-3 h-[96px] flex-row items-center px-6">
+          <SurfaceCard variant="control" className="mt-3 flex-row items-center rounded-[26px] border-slate-200 bg-white px-6 py-4"
+          >
             <AppText
               family="inter"
-              weight="bold"
-              variant='inputValue'
+              weight="regular"
+              variant='fieldLabel'
               className="mr-2 text-slate-400"
             >
               R$
@@ -243,13 +247,20 @@ export default function NovaDespesa() {
               value={valorTexto}
               onChangeText={(texto) => setValorTexto(formatarValor(texto))}
               placeholder="0,00"
-              placeholderTextColor="#9CA3AF"
-              keyboardType="numeric"
-              className="flex-1 text-[36px] leading-[40px] text-slate-950"
+              placeholderTextColor="#94A3B8"
+              maxLength={15}
+              keyboardType="decimal-pad"
+              allowFontScaling={false}
               style={{
+                flex: 1,
+                minWidth: 0,
                 fontFamily: 'InterBold',
+                fontSize: 38,
+                lineHeight: 46,
                 padding: 0,
                 includeFontPadding: false,
+                textAlignVertical: 'center',
+                color: '#0F172A',
               }}
             />
 
@@ -267,7 +278,7 @@ export default function NovaDespesa() {
               onChangeText={setDescricao}
               placeholder="Adicione uma descrição"
               placeholderTextColor="#94A3B8"
-              className="text-[16px] lineHeight: 22 text-slate-900"
+              className="text-[16px] leading-[22px] text-slate-900"
               style={{ fontFamily: 'InterRegular', padding: 0 }}
             />
           </FormField>
@@ -302,10 +313,10 @@ export default function NovaDespesa() {
 
         <Pressable
           onPress={handleSalvarTransacao}
-          disabled={salvando}
+          disabled={botaoDesabilitado}
           accessibilityRole="button"
           accessibilityLabel={salvando ? 'Salvando transação' : 'Salvar transação'}
-          className={`mt-8 mb-10 overflow-hidden rounded-[24px] ${salvando ? 'opacity-70' : ''}`}
+          className={`mt-8 mb-10 overflow-hidden rounded-[24px] ${botaoDesabilitado ? 'opacity-70' : ''}`}
         >
           {({ pressed }) => (
             <ImageBackground
@@ -314,7 +325,7 @@ export default function NovaDespesa() {
               className="h-[66px] flex-row items-center rounded-[24px] px-4"
               imageStyle={{
                 borderRadius: 24,
-                transform: [{ scale: pressed ? 1.08 : 1.12 }],
+                transform: [{ scale: pressed ? 1.02 : 1.05 }],
               }}
             >
               <View className={`absolute inset-0 ${pressed ? 'bg-black/20' : 'bg-black/5'}`} />

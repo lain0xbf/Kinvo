@@ -187,7 +187,7 @@ export default function Home() {
                 className="h-[66px] flex-row items-center rounded-[24px] px-4"
                 imageStyle={{
                   borderRadius: 24,
-                  transform: [{ scale: pressed ? 1.08 : 1.12 }],
+                  transform: [{ scale: pressed ? 1.02 : 1.05 }],
                 }}>
                 <View className={`absolute inset-0 ${pressed ? 'bg-black/20' : 'bg-black/5'}`} />
 
