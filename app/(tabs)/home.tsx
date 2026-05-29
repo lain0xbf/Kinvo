@@ -216,12 +216,13 @@ export default function Home() {
             </AppText>
 
             <Pressable
+              onPress={() => router.push('/extrato')}
               hitSlop={8}
               className="rounded-full px-2.5 py-1"
               style={({ pressed }) => [{ opacity: pressed ? 0.72 : 1 }]}
             >
               <View className="flex-row items-center">
-                <AppText weight="bold" variant='fieldLabel' className="text-emerald-600">
+                <AppText weight="bold" variant="fieldLabel" className="text-emerald-600">
                   Ver todas
                 </AppText>
                 <Ionicons name="chevron-forward" size={14} color="#059669" style={{ marginLeft: 2 }} />
