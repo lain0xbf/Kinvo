@@ -35,15 +35,14 @@ const variantClasses: Record<TextVariant, string> = {
 
 const fontByFamilyAndWeight: Record<TextFamily, Record<TextWeight, string>> = {
   sofia: {
-    regular: 'SofiaProRegular',
-    bold: 'SofiaProBold',
+    regular: 'InterRegular',
+    bold: 'InterBold',
   },
   inter: {
     regular: 'InterRegular',
     bold: 'InterBold',
   },
 };
-
 export function AppText({
   variant = 'body',
   weight = 'regular',

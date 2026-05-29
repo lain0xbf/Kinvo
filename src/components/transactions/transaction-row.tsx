@@ -4,68 +4,123 @@ import { Ionicons } from '@expo/vector-icons';
 import type { TransacaoFinanceira } from '@/services/transactions';
 import { AppText } from '@/components/ui/app-text';
 import { formatarMoeda } from '@/utils/finance';
+import { cn } from '@/utils/cn';
+
+type TransactionRowVariant = 'light' | 'dark';
 
 type TransactionRowProps = {
   item: TransacaoFinanceira;
   className?: string;
+  variant?: TransactionRowVariant;
 };
 
 export const TransactionRow = memo(function TransactionRow({
   item,
   className,
+  variant = 'light',
 }: TransactionRowProps) {
   const ehReceita = item.tipo === 'receita';
-  const dataFormatada = new Date(item.data).toLocaleDateString('pt-BR');
+  const isDark = variant === 'dark';
 
-  const sinal = ehReceita ? '+' : '-';
-  const corValor = ehReceita ? 'text-emerald-600' : 'text-slate-900';
-  const bgIcone = ehReceita ? 'bg-emerald-100' : 'bg-rose-100';
-  const corIcone = ehReceita ? '#10B981' : '#E11D48';
+  const dataFormatada = new Date(item.data).toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+  });
 
   return (
-    <View className={`flex-row items-center bg-white px-4 py-4 ${className ?? ''}`}>
-      <View className={`h-12 w-12 items-center justify-center rounded-full ${bgIcone}`}>
+    <View
+      className={cn(
+        'min-h-[72px] flex-row items-center px-4 py-3',
+        isDark ? 'bg-transparent' : 'bg-white',
+        className
+      )}
+    >
+      <View
+        className={cn(
+          'h-10 w-10 items-center justify-center rounded-[14px] border',
+          ehReceita
+            ? isDark
+              ? 'border-emerald-400/20 bg-emerald-400/10'
+              : 'border-emerald-200 bg-emerald-50'
+            : isDark
+              ? 'border-rose-400/20 bg-rose-400/10'
+              : 'border-rose-200 bg-rose-50'
+        )}
+      >
         <Ionicons
-          name={ehReceita ? 'wallet-outline' : 'cart-outline'}
-          size={22}
-          color={corIcone}
+          name={ehReceita ? 'arrow-down-left-box' : 'arrow-up-right-box'}
+          size={18}
+          color={ehReceita ? '#34D399' : '#FB7185'}
         />
       </View>
 
-      <View className="ml-4 flex-1">
+      <View className="ml-3 flex-1">
         <AppText
-        family='inter'
+          family="inter"
           weight="bold"
-          variant='body'
-          className="text-slate-900"
+          variant="body"
+          className={isDark ? 'text-white' : 'text-slate-950'}
           numberOfLines={1}
         >
           {item.descricao}
         </AppText>
 
         <View className="mt-1 flex-row items-center">
-          <AppText family="inter" weight="regular" variant='subcaption' className="text-slate-500" numberOfLines={1}>
-            {item.categoria}
+          <AppText
+            family="inter"
+            variant="subcaption"
+            className={isDark ? 'text-slate-400' : 'text-slate-500'}
+            numberOfLines={1}
+          >
+            {item.categoria || 'Sem categoria'}
+          </AppText>
+
+          <View
+            className={cn(
+              'mx-2 h-1 w-1 rounded-full',
+              isDark ? 'bg-white/20' : 'bg-slate-300'
+            )}
+          />
+
+          <AppText
+            family="inter"
+            variant="subcaption"
+            className={isDark ? 'text-slate-500' : 'text-slate-400'}
+          >
+            {dataFormatada}
           </AppText>
         </View>
       </View>
 
       <View className="ml-3 items-end">
-        <AppText family="inter" weight="bold" variant='body' className={`${corValor}`}>
-          {sinal} {formatarMoeda(item.valor)}
+        <AppText
+          family="inter"
+          weight="bold"
+          variant="body"
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.85}
+          className={
+            ehReceita
+              ? isDark
+                ? 'text-emerald-300'
+                : 'text-emerald-600'
+              : isDark
+                ? 'text-white'
+                : 'text-slate-950'
+          }
+        >
+          {ehReceita ? '+' : '-'} {formatarMoeda(item.valor)}
         </AppText>
 
-        <AppText family="inter" weight="regular" variant='caption' className="mt-1 text-slate-400">
-          {dataFormatada}
+        <AppText
+          family="inter"
+          variant="caption"
+          className={isDark ? 'mt-0.5 text-slate-500' : 'mt-0.5 text-slate-400'}
+        >
+          {ehReceita ? 'Entrada' : 'Saída'}
         </AppText>
       </View>
-
-      <Ionicons
-        name="chevron-forward"
-        size={18}
-        color="#94A3B8"
-        style={{ marginLeft: 8 }}
-      />
     </View>
   );
 });

@@ -14,7 +14,7 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarHideOnKeyboard: true,
 
-        tabBarActiveTintColor: '#10B981',
+        tabBarActiveTintColor: '#34D399',
         tabBarInactiveTintColor: '#64748B',
 
         tabBarStyle: {
@@ -25,20 +25,20 @@ export default function TabsLayout() {
 
           overflow: 'visible',
 
-          height: 80 + insets.bottom,
-          paddingTop: 12,
+          height: 76 + insets.bottom,
+
+          paddingTop: 10,
           paddingBottom: insets.bottom > 0 ? insets.bottom : 12,
 
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '#020617',
           borderTopWidth: 1,
+          borderTopColor: 'rgba(255,255,255,0.10)',
 
           borderTopLeftRadius: 32,
           borderTopRightRadius: 32,
 
-          borderTopColor: '#F1F5F9',
-
-          shadowColor: '#0F172A',
-          shadowOpacity: 0.05,
+          shadowColor: '#000000',
+          shadowOpacity: 0.22,
           shadowRadius: 10,
           shadowOffset: { width: 0, height: -4 },
           elevation: 6,
@@ -73,7 +73,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="relatorios"
         options={{
-          title: 'Transações',
+          title: 'Relatorios',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'pie-chart' : 'pie-chart-outline'}
@@ -104,7 +104,8 @@ export default function TabsLayout() {
                 }}
               >
                 <LinearGradient
-                  colors={['#2EE6A6', '#18C58F', '#0fa596']}
+                  colors={['#34D399', '#10B981', '#047857']}
+
                   start={{ x: 0, y: 0.2 }}
                   end={{ x: 1, y: 0.8 }}
                   style={{
@@ -114,7 +115,7 @@ export default function TabsLayout() {
                     justifyContent: 'center',
                   }}
                 >
-                  <Ionicons name="add" size={26} color="#FFFFFF" />
+                  <Ionicons name="add" size={28} color="#020617" />
                 </LinearGradient>
               </Pressable>
             </View>
