@@ -9,13 +9,13 @@ import { useAppFonts } from '@/hooks/use-app-fonts';
 import { useAuthenticatedTransactions } from '@/hooks/use-authenticated-transactions';
 import { TransactionRow } from '@/components/transactions/transaction-row';
 import { calcularResumoFinanceiro, formatarMoeda } from '@/utils/finance';
-import { ImageBackground } from 'react-native';
 import { Asset } from 'expo-asset';
 import { auth } from '@/config/firebase';
 import { excluirTransacaoDoUsuario, type TransacaoFinanceira } from '@/services/transactions';
 import { TransactionSheet } from '@/components/transactions/transactionSheet';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { AppScreen } from '@/components/ui/app-screen';
 
 const fundoApp = require('../../assets/fundo_login.webp');
 
@@ -262,9 +262,7 @@ export default function Home() {
 
 
   return (
-    <ImageBackground source={fundoApp} className="flex-1" resizeMode="cover">
-      <View className="absolute inset-0 bg-slate-950/85" />
-      <SafeAreaView className="flex-1">
+    <AppScreen edges={['top', 'left', 'right']}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: bottomPadding }}>
@@ -508,8 +506,7 @@ export default function Home() {
           onDelete={handleExcluirTransacao}
           onEdit={handleEditarTransacao}
         />
-      </SafeAreaView>
-    </ImageBackground>
+    </AppScreen>
   );
 }
 
