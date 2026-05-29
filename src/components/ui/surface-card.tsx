@@ -1,7 +1,7 @@
 import { cn } from '@/utils/cn';
 import { View, type ViewProps, type ViewStyle } from 'react-native';
 
-type SurfaceVariant = 'default' | 'wallet' | 'control' | 'danger' | 'night' | 'nightSoft' | 'nightDanger';
+type SurfaceVariant = 'default' | 'wallet' | 'control' | 'danger' | 'night' | 'nightSoft' | 'nightDanger' | 'nightSheet';
 
 type SurfaceCardProps = ViewProps & {
   className?: string;
@@ -16,6 +16,7 @@ const variantClasses: Record<SurfaceVariant, string> = {
   night: 'border-white/10 bg-white/[0.04]',
   nightSoft: 'border-white/15 bg-white/[0.06]',
   nightDanger: 'border-rose-400/20 bg-rose-400/10',
+  nightSheet: 'border-white/10 bg-slate-950',
 
 };
 
@@ -69,6 +70,13 @@ const shadowByVariant: Record<SurfaceVariant, ViewStyle> = {
     shadowRadius: 10,
     elevation: 2,
   },
+  nightSheet: {
+  shadowColor: '#000000',
+  shadowOffset: { width: 0, height: -8 },
+  shadowOpacity: 0.28,
+  shadowRadius: 18,
+  elevation: 10,
+},
 };
 
 export function SurfaceCard({

@@ -7,20 +7,25 @@ import { formatarMoeda } from '@/utils/finance';
 import { cn } from '@/utils/cn';
 
 type TransactionRowVariant = 'light' | 'dark';
+type TransactionRowDensity = 'regular' | 'compact';
+
 
 type TransactionRowProps = {
   item: TransacaoFinanceira;
   className?: string;
   variant?: TransactionRowVariant;
+  density?: TransactionRowDensity;
 };
 
 export const TransactionRow = memo(function TransactionRow({
   item,
   className,
   variant = 'light',
+  density = 'regular',
 }: TransactionRowProps) {
   const ehReceita = item.tipo === 'receita';
   const isDark = variant === 'dark';
+  const isCompact = density === 'compact';
 
   const dataFormatada = new Date(item.data).toLocaleDateString('pt-BR', {
     day: '2-digit',
@@ -30,14 +35,18 @@ export const TransactionRow = memo(function TransactionRow({
   return (
     <View
       className={cn(
-        'min-h-[72px] flex-row items-center px-4 py-3',
+        isCompact
+          ? 'min-h-[64px] flex-row items-center px-3.5 py-2.5'
+          : 'min-h-[72px] flex-row items-center px-4 py-3',
         isDark ? 'bg-transparent' : 'bg-white',
         className
       )}
     >
       <View
         className={cn(
-          'h-10 w-10 items-center justify-center rounded-[14px] border',
+          isCompact
+            ? 'h-9 w-9 items-center justify-center rounded-[13px] border'
+            : 'h-10 w-10 items-center justify-center rounded-[14px] border',
           ehReceita
             ? isDark
               ? 'border-emerald-400/20 bg-emerald-400/10'
@@ -49,7 +58,7 @@ export const TransactionRow = memo(function TransactionRow({
       >
         <Ionicons
           name={ehReceita ? 'arrow-down-left-box' : 'arrow-up-right-box'}
-          size={18}
+          size={isCompact ? 17 : 18}
           color={ehReceita ? '#34D399' : '#FB7185'}
         />
       </View>
