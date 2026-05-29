@@ -4,9 +4,11 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   onSnapshot,
   query,
   serverTimestamp,
+  updateDoc,
   where,
   type DocumentData,
   type QueryDocumentSnapshot,
@@ -38,6 +40,13 @@ export type NovaTransacao = {
   tipo: TipoTransacao;
   categoria: string;
   data?: Date;
+};
+
+export type AtualizarTransacao = {
+  descricao: string;
+  valor: number;
+  tipo: TipoTransacao;
+  categoria: string;
 };
 
 function normalizarNumero(valor: unknown): number {
@@ -118,8 +127,62 @@ export async function criarTransacaoParaUsuario(userId: string, transacao: NovaT
   });
 }
 
+
+
 export async function excluirTransacaoDoUsuario(userId: string, transacaoId: string) {
   const transacaoRef = doc(firestore, 'transacoes', transacaoId);
 
   await deleteDoc(transacaoRef);
+}
+
+
+export async function buscarTransacaoDoUsuario(userId: string, transacaoId: string) {
+  const transacaoRef = doc(firestore, 'transacoes', transacaoId);
+  const snapshot = await getDoc(transacaoRef);
+
+  if (!snapshot.exists()) {
+    return null;
+  }
+
+  const dados = snapshot.data() as RegistroBruto;
+
+  if (dados.userId !== userId) {
+    return null;
+  }
+
+  return {
+    id: snapshot.id,
+    descricao: normalizarTexto(dados.descricao, 'Sem descricao'),
+    valor: normalizarNumero(dados.valor),
+    tipo: normalizarTipo(dados.tipo),
+    categoria: normalizarTexto(dados.categoria, 'Geral'),
+    data: normalizarData(dados.data),
+  };
+}
+
+export async function atualizarTransacaoDoUsuario(
+  userId: string,
+  transacaoId: string,
+  transacao: AtualizarTransacao
+) {
+  const transacaoRef = doc(firestore, 'transacoes', transacaoId);
+  const snapshot = await getDoc(transacaoRef);
+
+  if (!snapshot.exists()) {
+    throw new Error('Transacao nao encontrada.');
+  }
+
+  const dados = snapshot.data() as RegistroBruto;
+
+  if (dados.userId !== userId) {
+    throw new Error('Transacao nao pertence ao usuario.');
+  }
+
+  await updateDoc(transacaoRef, {
+    descricao: transacao.descricao.trim(),
+    valor: transacao.valor,
+    tipo: transacao.tipo,
+    categoria: transacao.categoria.trim() || 'Geral',
+    atualizadoEm: serverTimestamp(),
+  });
 }

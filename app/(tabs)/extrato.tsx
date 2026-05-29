@@ -11,6 +11,7 @@ import { useAuthenticatedTransactions } from '@/hooks/use-authenticated-transact
 import { TransactionRow } from '@/components/transactions/transaction-row';
 import { TransactionSheet } from '@/components/transactions/transactionSheet';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useRouter } from 'expo-router';
 
 
 type Filtro = 'todas' | TipoTransacao;
@@ -44,6 +45,8 @@ export default function Extrato() {
   const { authResolvida, carregando, erro, transacoes, userId } = useAuthenticatedTransactions();
   const [transacaoSelecionada, setTransacaoSelecionada] = useState<TransacaoFinanceira | null>(null);
   const [busca, setBusca] = useState('');
+
+  const router = useRouter();
 
   const tabBarHeight = useBottomTabBarHeight();
   const bottomPadding = tabBarHeight + 12; // 12 = respiro visual
@@ -107,6 +110,18 @@ export default function Extrato() {
 
     await excluirTransacaoDoUsuario(userId, transacaoSelecionada.id);
     setTransacaoSelecionada(null);
+  }
+
+  function handleEditarTransacao() {
+    if (!transacaoSelecionada) return;
+
+    const transacaoId = transacaoSelecionada.id;
+    setTransacaoSelecionada(null);
+
+    router.push({
+      pathname: '/editar-transacao',
+      params: { id: transacaoId },
+    });
   }
 
   const handleMudarFiltro = useCallback((proximoFiltro: Filtro) => {
@@ -244,6 +259,7 @@ export default function Extrato() {
         transaction={transacaoSelecionada}
         onClose={() => setTransacaoSelecionada(null)}
         onDelete={handleExcluirTransacao}
+        onEdit={handleEditarTransacao}
       />
 
       {/*       <Modal

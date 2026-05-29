@@ -13,9 +13,10 @@ type Props = {
   transaction: TransacaoFinanceira | null;
   onClose: () => void;
   onDelete?: () => Promise<void> | void;
+  onEdit?: () => void;
 };
 
-export function TransactionSheet({ visible, transaction, onClose, onDelete }: Props) {
+export function TransactionSheet({ visible, transaction, onClose, onDelete, onEdit }: Props) {
   const [deletando, setDeletando] = useState(false);
 
   const insets = useSafeAreaInsets();
@@ -77,13 +78,22 @@ export function TransactionSheet({ visible, transaction, onClose, onDelete }: Pr
             </View>
           </View>
 
+          {onEdit ? (
+            <ActionButton
+              label="Editar transacao"
+              variant="ghost"
+              className="mt-4"
+              onPress={onEdit}
+            />
+          ) : null}
+
           {onDelete ? (
             <ActionButton
               label={deletando ? 'Excluindo...' : 'Excluir transação'}
               loading={deletando}
               disabled={deletando}
               // icon={<Ionicons name="trash-outline" size={18} color="#FFFFFF" />}
-              className="mt-4 bg-rose-600"
+              className={onEdit ? 'mt-2 bg-rose-600' : 'mt-4 bg-rose-600'}
               onPress={handleDelete}
             />
           ) : null}
