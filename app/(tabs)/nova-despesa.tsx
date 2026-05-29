@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ImageBackground, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { ImageBackground, Keyboard, Pressable, TextInput, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -40,7 +41,10 @@ function CategoryOption({
 }) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        Keyboard.dismiss();
+        onPress();
+      }}
       hitSlop={6}
       accessibilityRole="button"
       accessibilityLabel={`Categoria ${nome}`}
@@ -159,15 +163,17 @@ export default function NovaDespesa() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#F5F7FA]" edges={['top', 'left', 'right', 'bottom']}>
-      <ScrollView
+      <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
         bounces={false}
         keyboardShouldPersistTaps="handled"
+        enableOnAndroid
+        enableAutomaticScroll
+        extraScrollHeight={24}
         contentContainerStyle={{
           paddingHorizontal: 20,
           paddingTop: 12,
-          paddingBottom: Math.max(120, insets.bottom + 88),
-
+          paddingBottom: Math.max(140, insets.bottom + 96),
         }}
       >
         <View className="mb-4 h-[76px] items-center justify-center py-2">
@@ -195,7 +201,10 @@ export default function NovaDespesa() {
             return (
               <Pressable
                 key={opcao}
-                onPress={() => setTipo(opcao)}
+                onPress={() => {
+                  Keyboard.dismiss();
+                  setTipo(opcao);
+                }}
                 accessibilityRole="button"
                 accessibilityLabel={opcao === 'despesa' ? 'Selecionar despesa' : 'Selecionar receita'}
                 accessibilityState={{ selected: ativo }}
@@ -267,6 +276,8 @@ export default function NovaDespesa() {
             <TextInput
               value={descricao}
               onChangeText={setDescricao}
+              returnKeyType="done"
+              onSubmitEditing={Keyboard.dismiss}
               placeholder="Adicione uma descrição"
               placeholderTextColor="#94A3B8"
               className="text-[16px] leading-[22px] text-slate-900"
@@ -344,7 +355,7 @@ export default function NovaDespesa() {
           )}
         </Pressable>
 
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

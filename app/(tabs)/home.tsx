@@ -15,7 +15,7 @@ import { ImageBackground } from 'react-native';
 import { Asset } from 'expo-asset';
 import { LinearGradient } from 'expo-linear-gradient';
 import { auth } from '@/config/firebase';
-import { TransacaoFinanceira } from '@/services/transactions';
+import { excluirTransacaoDoUsuario, type TransacaoFinanceira } from '@/services/transactions';
 import { TransactionSheet } from '@/components/transactions/transactionSheet';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
@@ -65,6 +65,24 @@ export default function Home() {
       .slice(0, 5);
   }, [transacoes]);
 
+  async function handleExcluirTransacao() {
+    if (!userId || !transacaoSelecionada) return;
+
+    await excluirTransacaoDoUsuario(userId, transacaoSelecionada.id);
+    setTransacaoSelecionada(null);
+  }
+
+  function handleEditarTransacao() {
+    if (!transacaoSelecionada) return;
+
+    const transacaoId = transacaoSelecionada.id;
+    setTransacaoSelecionada(null);
+
+    router.push({
+      pathname: '/editar-transacao',
+      params: { id: transacaoId },
+    });
+  }
   /*   const saldoPositivo = resumo.saldo >= 0; */
 
   if (!fontsLoaded || !authResolvida || !userId || carregando || !carregouImagem) {
@@ -256,6 +274,8 @@ export default function Home() {
         visible={!!transacaoSelecionada}
         transaction={transacaoSelecionada}
         onClose={() => setTransacaoSelecionada(null)}
+        onDelete={handleExcluirTransacao}
+        onEdit={handleEditarTransacao}
       />
     </SafeAreaView>
   );
