@@ -60,7 +60,7 @@ export function ActionButton({
       ) : (
         <View className="flex-row items-center justify-center">
           {icon}
-          <AppText variant="body" weight="bold" className={cn('text-[14px]', tokens.text, textClassName)}>
+          <AppText variant="cta" family='inter' weight="bold" className={cn('text-[14px]', tokens.text, textClassName)}>
             {label}
           </AppText>
         </View>

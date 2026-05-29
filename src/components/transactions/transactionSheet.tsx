@@ -1,11 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Modal, Pressable, View } from 'react-native';
+import { Modal, Pressable, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TransacaoFinanceira } from '@/services/transactions';
 import { formatarMoeda } from '@/utils/finance';
 import { SurfaceCard } from '../ui/surface-card';
 import { AppText } from '../ui/app-text';
 import { ActionButton } from '../ui/action-button';
+import { useState } from 'react';
 
 type Props = {
   visible: boolean;
@@ -15,26 +16,40 @@ type Props = {
 };
 
 export function TransactionSheet({ visible, transaction, onClose, onDelete }: Props) {
+  const [deletando, setDeletando] = useState(false);
+
   const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
+
+  async function handleDelete() {
+    if (!onDelete || deletando) return;
+    setDeletando(true);
+    try {
+      await onDelete();
+    } finally {
+      setDeletando(false);
+    }
+  }
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View className="flex-1 bg-slate-950/45">
+      <View className="flex-1 bg-slate-950/40">
         <Pressable className="flex-1" onPress={onClose} />
 
         <SurfaceCard
           className="rounded-t-[28px] px-5 pt-4"
-          style={{ paddingBottom: Math.max(insets.bottom + 12, 24) }}
+          style={{ maxHeight: height * 0.85, paddingBottom: Math.max(insets.bottom + 12, 24) }}
         >
           <View className="mb-3 h-1.5 w-12 self-center rounded-full bg-slate-300" />
 
           <View className="items-center">
-            <AppText family="sofia" variant="title" weight="bold" className="mt-1 text-center text-slate-950">
+            <AppText family="sofia" variant="title" numberOfLines={2} weight="bold" className="text-center text-slate-900">
               {transaction?.descricao}
             </AppText>
 
             <AppText
-              variant="display"
+              family='inter'
+              variant="modalValor"
               weight="bold"
               className={transaction?.tipo === 'receita' ? 'mt-3 text-emerald-600' : 'mt-3 text-rose-600'}
             >
@@ -42,17 +57,21 @@ export function TransactionSheet({ visible, transaction, onClose, onDelete }: Pr
             </AppText>
           </View>
 
-          <View className="mt-5 rounded-[20px] bg-slate-50 px-4 py-3">
+
+
+          <View className="mt-4 rounded-[20px] bg-slate-50 px-4 py-3">
             <View className="flex-row items-center justify-between">
-              <AppText variant="caption" className="text-slate-500">Tipo</AppText>
-              <AppText variant="caption" weight="bold" className="text-slate-800">
+              <AppText variant="modalLabel" family='inter' className="text-slate-500">Tipo</AppText>
+              <AppText variant="body" family='inter' weight="bold" className="text-slate-900">
                 {transaction?.tipo === 'receita' ? 'Receita' : 'Despesa'}
               </AppText>
             </View>
 
-            <View className="mt-3 flex-row items-center justify-between">
-              <AppText variant="caption" className="text-slate-500">Categoria</AppText>
-              <AppText variant="caption" weight="bold" className="text-slate-800">
+            <View className="my-3 h-px bg-slate-200" />
+
+            <View className="flex-row items-center justify-between">
+              <AppText variant="modalLabel" family='inter' className="text-slate-500">Categoria</AppText>
+              <AppText variant="body" family="inter" weight="bold" className="text-slate-900">
                 {transaction?.categoria || 'Sem categoria'}
               </AppText>
             </View>
@@ -60,14 +79,20 @@ export function TransactionSheet({ visible, transaction, onClose, onDelete }: Pr
 
           {onDelete ? (
             <ActionButton
-              label="Excluir transação"
-              icon={<Ionicons name="trash-outline" size={18} color="#FFFFFF" />}
-              className="mt-5 bg-rose-600"
-              onPress={onDelete}
+              label={deletando ? 'Excluindo...' : 'Excluir transação'}
+              loading={deletando}
+              disabled={deletando}
+              // icon={<Ionicons name="trash-outline" size={18} color="#FFFFFF" />}
+              className="mt-4 bg-rose-600"
+              onPress={handleDelete}
             />
           ) : null}
 
-          <ActionButton label="Fechar" variant="ghost" className="mt-2" onPress={onClose} />
+          <ActionButton
+            label="Fechar"
+            variant="ghost"
+            className={onDelete ? 'mt-2' : 'mt-4'} // 8 entre botões, 16 se for botão único
+            onPress={onClose} />
         </SurfaceCard>
       </View>
     </Modal>

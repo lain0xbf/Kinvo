@@ -1,7 +1,7 @@
 import { Text, type TextProps } from 'react-native';
 import { cn } from '@/utils/cn';
 
-type TextVariant = 'display' | 'title' | 'subtitle' | 'subLogin' | 'body' | 'caption' | 'label' | 'subcaption' | 'cta' | 'categoria' | 'titleCardES' | 'screenTitle' | 'screenSubtitle' | 'fieldLabel' | 'amount' | 'inputValue';
+type TextVariant = 'display' | 'title' | 'subtitle' | 'subLogin' | 'body' | 'caption' | 'modalValor' | 'modalLabel' | 'label' | 'subcaption' | 'cta' | 'categoria' | 'titleCardES' | 'screenTitle' | 'screenSubtitle' | 'fieldLabel' | 'amount' | 'inputValue';
 type TextWeight = 'regular' | 'bold';
 type TextFamily = 'sofia' | 'inter';
 
@@ -13,6 +13,8 @@ type AppTextProps = TextProps & {
 };
 
 const variantClasses: Record<TextVariant, string> = {
+  modalLabel: 'text-[12px] leading-[16px]',
+  modalValor: 'text-[32px] leading-[34px]',
   display: 'text-[30px] leading-[36px]',
   title: 'text-[24px] leading-[30px]',
   subtitle: 'text-[18px] leading-[24px]',
