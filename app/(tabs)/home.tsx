@@ -27,6 +27,28 @@ const periodLabels: Record<PeriodFilter, string> = {
   all: 'Tudo',
 };
 
+const periodOptions: Array<{
+  value: PeriodFilter;
+  label: string;
+  description: string;
+}> = [
+    {
+      value: 'currentMonth',
+      label: 'Este mês',
+      description: 'Entradas e saídas do mês atual',
+    },
+    {
+      value: 'previousMonth',
+      label: 'Mês passado',
+      description: 'Compare com o ciclo anterior',
+    },
+    {
+      value: 'all',
+      label: 'Tudo',
+      description: 'Resumo completo da carteira',
+    },
+  ];
+
 function isTransactionInPeriod(dateValue: string, period: PeriodFilter) {
   if (period === 'all') return true;
 
@@ -51,6 +73,46 @@ function isTransactionInPeriod(dateValue: string, period: PeriodFilter) {
     transactionDate.getMonth() === targetMonth &&
     transactionDate.getFullYear() === targetYear
   );
+}
+
+function formatMonthLabel(date: Date) {
+  return date.toLocaleDateString('pt-BR', {
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function getPeriodDisplayLabel(period: PeriodFilter) {
+  const now = new Date();
+
+  if (period === 'all') return 'Tudo';
+
+  if (period === 'currentMonth') {
+    return formatMonthLabel(now);
+  }
+
+  const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  return formatMonthLabel(previousMonth);
+}
+
+function getPeriodDescription(period: PeriodFilter) {
+  const now = new Date();
+
+  if (period === 'all') return 'Resumo completo da carteira';
+
+  if (period === 'currentMonth') {
+    return `Entradas e saídas de ${now.toLocaleDateString('pt-BR', {
+      month: 'long',
+      year: 'numeric',
+    })}`;
+  }
+
+  const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  return `Entradas e saídas de ${previousMonth.toLocaleDateString('pt-BR', {
+    month: 'long',
+    year: 'numeric',
+  })}`;
 }
 
 type BalanceMetricProps = {
@@ -90,7 +152,15 @@ function LedgerFlowStrip({ income, expense }: LedgerFlowStripProps) {
   const hasFlow = income > 0 || expense > 0;
 
   if (!hasFlow) {
-    return <View className="mt-5 h-1.5 rounded-full bg-white/10" />;
+    return (
+      <View className="mt-5">
+        <View className="h-1.5 rounded-full bg-white/10" />
+
+        <AppText family="inter" variant="caption" className="mt-2 text-slate-500">
+          Nenhum fluxo registrado neste período
+        </AppText>
+      </View>
+    );
   }
 
   return (
@@ -106,6 +176,15 @@ function LedgerFlowStrip({ income, expense }: LedgerFlowStripProps) {
       />
     </View>
   );
+}
+
+function getInitials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+
+  if (parts.length === 0) return 'U';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
 }
 export default function Home() {
   const [fontsLoaded] = useAppFonts();
@@ -142,7 +221,12 @@ export default function Home() {
     );
   }, [transacoes, periodFilter]);
 
-  const resumo = useMemo(
+  const resumoTotal = useMemo(
+    () => calcularResumoFinanceiro(transacoes),
+    [transacoes]
+  );
+
+  const resumoPeriodo = useMemo(
     () => calcularResumoFinanceiro(transacoesDoPeriodo),
     [transacoesDoPeriodo]
   );
@@ -209,7 +293,7 @@ export default function Home() {
                   ]}
                 >
                   <AppText family="inter" weight="bold" className="text-[13px] text-emerald-300">
-                    {nome.slice(0, 1).toUpperCase()}
+                    {getInitials(nome)}
                   </AppText>
                 </Pressable>
               </View>
@@ -228,7 +312,9 @@ export default function Home() {
                   </AppText>
 
                   <AppText family="inter" variant="caption" className="mt-0.5 text-slate-500">
-                    Fluxo no período
+                    {periodFilter === 'all'
+                      ? 'Fluxo geral da carteira'
+                      : `Fluxo de ${getPeriodDisplayLabel(periodFilter)}`}
                   </AppText>
                 </View>
 
@@ -239,7 +325,7 @@ export default function Home() {
                 >
                   <View className="flex-row items-center">
                     <AppText family="inter" weight="bold" variant="caption" className="text-slate-200">
-                      {periodLabels[periodFilter]}
+                      {getPeriodDisplayLabel(periodFilter)}
                     </AppText>
 
                     <Ionicons name="chevron-down" size={13} color="#94A3B8" style={{ marginLeft: 4 }} />
@@ -253,19 +339,20 @@ export default function Home() {
                 variant="display"
                 className="mt-2 text-[34px] leading-[40px] text-white"
               >
-                {formatarMoeda(resumo.saldo)}
+                {formatarMoeda(resumoTotal.saldo)}
+
               </AppText>
 
               <LedgerFlowStrip
-                income={resumo.receitas}
-                expense={resumo.despesas}
+                income={resumoPeriodo.receitas}
+                expense={resumoPeriodo.despesas}
               />
 
 
               <View className="mt-4 flex-row">
                 <BalanceMetric
                   label="Entradas"
-                  value={formatarMoeda(resumo.receitas)}
+                  value={formatarMoeda(resumoPeriodo.receitas)}
                   tone="income"
                 />
 
@@ -273,7 +360,7 @@ export default function Home() {
 
                 <BalanceMetric
                   label="Saídas"
-                  value={formatarMoeda(resumo.despesas)}
+                  value={formatarMoeda(resumoPeriodo.despesas)}
                   tone="expense"
                 />
               </View>
@@ -359,30 +446,54 @@ export default function Home() {
                 Período do resumo
               </AppText>
 
-              {(['currentMonth', 'previousMonth', 'all'] as const).map((option) => {
-                const selected = periodFilter === option;
+              {periodOptions.map((option) => {
+                const selected = periodFilter === option.value;
 
                 return (
                   <Pressable
-                    key={option}
+                    key={option.value}
                     onPress={() => {
-                      setPeriodFilter(option);
+                      setPeriodFilter(option.value);
                       setPeriodSheetOpen(false);
                     }}
-                    className="mt-3 flex-row items-center justify-between rounded-[18px] border border-white/10 bg-white/5 px-4 py-4"
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    className={
+                      selected
+                        ? 'mt-3 flex-row items-center justify-between rounded-[18px] border border-emerald-400/25 bg-emerald-400/10 px-4 py-4'
+                        : 'mt-3 flex-row items-center justify-between rounded-[18px] border border-white/10 bg-white/5 px-4 py-4'
+                    }
                   >
-                    <AppText
-                      family="inter"
-                      weight={selected ? 'bold' : 'regular'}
-                      variant="body"
-                      className={selected ? 'text-emerald-300' : 'text-slate-200'}
-                    >
-                      {periodLabels[option]}
-                    </AppText>
+                    <View className="flex-1 pr-3">
+                      <AppText
+                        family="inter"
+                        weight="bold"
+                        variant="body"
+                        className={selected ? 'text-emerald-300' : 'text-slate-100'}
+                      >
+                        {option.label}
+                      </AppText>
 
-                    {selected ? (
-                      <Ionicons name="checkmark" size={18} color="#34D399" />
-                    ) : null}
+                      <AppText
+                        family="inter"
+                        variant="caption"
+                        className={selected ? 'mt-0.5 text-emerald-200/70' : 'mt-0.5 text-slate-500'}
+                      >
+                        {getPeriodDescription(option.value)}
+                      </AppText>
+                    </View>
+
+                    <View
+                      className={
+                        selected
+                          ? 'h-8 w-8 items-center justify-center rounded-full bg-emerald-400'
+                          : 'h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5'
+                      }
+                    >
+                      {selected ? (
+                        <Ionicons name="checkmark" size={17} color="#020617" />
+                      ) : null}
+                    </View>
                   </Pressable>
                 );
               })}
