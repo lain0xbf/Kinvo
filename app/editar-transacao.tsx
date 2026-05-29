@@ -15,20 +15,9 @@ import { LoadingScreen } from '@/components/ui/loading-screen';
 import { SurfaceCard } from '@/components/ui/surface-card';
 import { useAppFonts } from '@/hooks/use-app-fonts';
 import { FormField } from '@/components/FormField';
+import { categoriasTransacao } from '@/constants/transacoes-categorias';
 
 const fundo2 = require('../assets/button.png');
-
-const categorias = [
-  { nome: 'Alimentacao', icon: 'cart-outline' },
-  { nome: 'Transporte', icon: 'bus-outline' },
-  { nome: 'Moradia', icon: 'home-outline' },
-  { nome: 'Saude', icon: 'heart-outline' },
-  { nome: 'Lazer', icon: 'game-controller-outline' },
-  { nome: 'Educacao', icon: 'school-outline' },
-  { nome: 'Compras', icon: 'bag-outline' },
-  { nome: 'Servicos', icon: 'construct-outline' },
-  { nome: 'Outros', icon: 'ellipsis-horizontal' },
-] as const;
 
 function formatarValor(texto: string) {
   const numero = texto.replace(/\D/g, '');
@@ -310,7 +299,7 @@ export default function EditarTransacao() {
           </AppText>
 
           <View className="mt-3 flex-row flex-wrap">
-            {categorias.map((item) => (
+            {categoriasTransacao.map((item) => (
               <CategoryOption
                 key={item.nome}
                 nome={item.nome}

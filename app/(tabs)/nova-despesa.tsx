@@ -11,20 +11,11 @@ import { SurfaceCard } from '@/components/ui/surface-card';
 import { useAppFonts } from '@/hooks/use-app-fonts';
 import { Ionicons } from '@expo/vector-icons';
 import { FormField } from '@/components/FormField';
+import { categoriasTransacao } from '@/constants/transacoes-categorias';
+
 
 const fundo2 = require('../../assets/button.png');
 
-const categorias = [
-  { nome: 'Alimentação', icon: 'cart-outline' },
-  { nome: 'Transporte', icon: 'bus-outline' },
-  { nome: 'Moradia', icon: 'home-outline' },
-  { nome: 'Saúde', icon: 'heart-outline' },
-  { nome: 'Lazer', icon: 'game-controller-outline' },
-  { nome: 'Educação', icon: 'school-outline' },
-  { nome: 'Compras', icon: 'bag-outline' },
-  { nome: 'Serviços', icon: 'construct-outline' },
-  { nome: 'Outros', icon: 'ellipsis-horizontal' },
-] as const;
 
 function formatarValor(texto: string) {
   const numero = texto.replace(/\D/g, '');
@@ -290,7 +281,7 @@ export default function NovaDespesa() {
           </AppText>
 
           <View className="mt-3 flex-row flex-wrap">
-            {categorias.map((item) => (
+            {categoriasTransacao.map((item) => (
               <CategoryOption
                 key={item.nome}
                 nome={item.nome}
