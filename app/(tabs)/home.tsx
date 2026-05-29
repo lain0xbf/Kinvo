@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Modal, Pressable, ScrollView, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { AppText } from '@/components/ui/app-text';
 import { SurfaceCard } from '@/components/ui/surface-card';
@@ -18,6 +18,40 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
 const fundoApp = require('../../assets/fundo_login.webp');
+
+type PeriodFilter = 'currentMonth' | 'previousMonth' | 'all';
+
+const periodLabels: Record<PeriodFilter, string> = {
+  currentMonth: 'Este mês',
+  previousMonth: 'Mês passado',
+  all: 'Tudo',
+};
+
+function isTransactionInPeriod(dateValue: string, period: PeriodFilter) {
+  if (period === 'all') return true;
+
+  const transactionDate = new Date(dateValue);
+  const now = new Date();
+
+  const targetMonth =
+    period === 'currentMonth'
+      ? now.getMonth()
+      : now.getMonth() === 0
+        ? 11
+        : now.getMonth() - 1;
+
+  const targetYear =
+    period === 'currentMonth'
+      ? now.getFullYear()
+      : now.getMonth() === 0
+        ? now.getFullYear() - 1
+        : now.getFullYear();
+
+  return (
+    transactionDate.getMonth() === targetMonth &&
+    transactionDate.getFullYear() === targetYear
+  );
+}
 
 type BalanceMetricProps = {
   label: string;
@@ -47,11 +81,42 @@ function BalanceMetric({ label, value, tone }: BalanceMetricProps) {
   );
 }
 
+type LedgerFlowStripProps = {
+  income: number;
+  expense: number;
+};
+
+function LedgerFlowStrip({ income, expense }: LedgerFlowStripProps) {
+  const hasFlow = income > 0 || expense > 0;
+
+  if (!hasFlow) {
+    return <View className="mt-5 h-1.5 rounded-full bg-white/10" />;
+  }
+
+  return (
+    <View className="mt-5 h-1.5 flex-row overflow-hidden rounded-full bg-white/10">
+      <View
+        className="h-full bg-emerald-400"
+        style={{ flex: Math.max(income, 1) }}
+      />
+
+      <View
+        className="h-full bg-rose-400/80"
+        style={{ flex: Math.max(expense, 1) }}
+      />
+    </View>
+  );
+}
 export default function Home() {
   const [fontsLoaded] = useAppFonts();
   const { authResolvida, carregando, erro, transacoes, userId } = useAuthenticatedTransactions();
   const [carregouImagem, setCarregouImagem] = useState(false);
   const [transacaoSelecionada, setTransacaoSelecionada] = useState<TransacaoFinanceira | null>(null);
+  const [periodFilter, setPeriodFilter] = useState<PeriodFilter>('currentMonth');
+  const [periodSheetOpen, setPeriodSheetOpen] = useState(false);
+
+  const insets = useSafeAreaInsets();
+
 
   const tabBarHeight = useBottomTabBarHeight();
   const bottomPadding = tabBarHeight + 12; // 12 = respiro visual
@@ -71,7 +136,17 @@ export default function Home() {
   }, []);
 
 
-  const resumo = useMemo(() => calcularResumoFinanceiro(transacoes), [transacoes]);
+  const transacoesDoPeriodo = useMemo(() => {
+    return transacoes.filter((item) =>
+      isTransactionInPeriod(item.data, periodFilter)
+    );
+  }, [transacoes, periodFilter]);
+
+  const resumo = useMemo(
+    () => calcularResumoFinanceiro(transacoesDoPeriodo),
+    [transacoesDoPeriodo]
+  );
+
   const movimentacoesRecentes = useMemo(() => {
     return [...transacoes]
       .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
@@ -144,15 +219,32 @@ export default function Home() {
               variant="wallet"
               className="mb-5 overflow-hidden rounded-[28px] px-5 pb-5 pt-5"
             >
-              <View className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-emerald-400/10" />
-              <View className="absolute -bottom-12 -left-8 h-36 w-36 rounded-full bg-teal-300/5" />
 
-              <View className="flex-row items-center justify-between">
-                <AppText weight="regular" family="inter" variant="caption" className="text-slate-300">
-                  Saldo disponível
-                </AppText>
 
-                <Ionicons name="eye-off-outline" size={16} color="#CBD5E1" />
+              <View className="flex-row items-start justify-between">
+                <View>
+                  <AppText weight="regular" family="inter" variant="caption" className="text-slate-300">
+                    Saldo disponível
+                  </AppText>
+
+                  <AppText family="inter" variant="caption" className="mt-0.5 text-slate-500">
+                    Fluxo no período
+                  </AppText>
+                </View>
+
+                <Pressable
+                  onPress={() => setPeriodSheetOpen(true)}
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5"
+                  hitSlop={8}
+                >
+                  <View className="flex-row items-center">
+                    <AppText family="inter" weight="bold" variant="caption" className="text-slate-200">
+                      {periodLabels[periodFilter]}
+                    </AppText>
+
+                    <Ionicons name="chevron-down" size={13} color="#94A3B8" style={{ marginLeft: 4 }} />
+                  </View>
+                </Pressable>
               </View>
 
               <AppText
@@ -163,9 +255,14 @@ export default function Home() {
               >
                 {formatarMoeda(resumo.saldo)}
               </AppText>
-              
 
-              <View className="mt-5 flex-row">
+              <LedgerFlowStrip
+                income={resumo.receitas}
+                expense={resumo.despesas}
+              />
+
+
+              <View className="mt-4 flex-row">
                 <BalanceMetric
                   label="Entradas"
                   value={formatarMoeda(resumo.receitas)}
@@ -239,6 +336,60 @@ export default function Home() {
             ) : null}
           </View>
         </ScrollView>
+
+        <Modal
+          visible={periodSheetOpen}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setPeriodSheetOpen(false)}
+        >
+          <View className="flex-1 justify-end bg-slate-950/65">
+            <Pressable
+              className="flex-1"
+              onPress={() => setPeriodSheetOpen(false)}
+            />
+
+            <View
+              className="rounded-t-[28px] border border-white/10 bg-slate-950 px-5 pt-4"
+              style={{ paddingBottom: Math.max(insets.bottom + 16, 32) }}
+            >
+              <View className="mb-4 h-1.5 w-12 self-center rounded-full bg-white/20" />
+
+              <AppText family="inter" weight="bold" variant="subtitle" className="text-white">
+                Período do resumo
+              </AppText>
+
+              {(['currentMonth', 'previousMonth', 'all'] as const).map((option) => {
+                const selected = periodFilter === option;
+
+                return (
+                  <Pressable
+                    key={option}
+                    onPress={() => {
+                      setPeriodFilter(option);
+                      setPeriodSheetOpen(false);
+                    }}
+                    className="mt-3 flex-row items-center justify-between rounded-[18px] border border-white/10 bg-white/5 px-4 py-4"
+                  >
+                    <AppText
+                      family="inter"
+                      weight={selected ? 'bold' : 'regular'}
+                      variant="body"
+                      className={selected ? 'text-emerald-300' : 'text-slate-200'}
+                    >
+                      {periodLabels[option]}
+                    </AppText>
+
+                    {selected ? (
+                      <Ionicons name="checkmark" size={18} color="#34D399" />
+                    ) : null}
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        </Modal>
+
         <TransactionSheet
           visible={!!transacaoSelecionada}
           transaction={transacaoSelecionada}
